@@ -56,17 +56,23 @@ struct AddExerciseView: View {
                     if exerciseType == .strength {
                         HStack {
                             TextField("Sets", text: $sets)
+                                #if os(iOS)
                                 .keyboardType(.numberPad)
+                                #endif
                             
                             Text("x")
                             
                             TextField("Reps", text: $reps)
+                                #if os(iOS)
                                 .keyboardType(.numberPad)
+                                #endif
                         }
                         
                         HStack {
                             TextField("Weight", text: $weight)
+                                #if os(iOS)
                                 .keyboardType(.decimalPad)
+                                #endif
                             Text("kg")
                         }
                     }
@@ -74,13 +80,17 @@ struct AddExerciseView: View {
                     if exerciseType == .cardio {
                         HStack {
                             TextField("Duration", text: $duration)
+                                #if os(iOS)
                                 .keyboardType(.numberPad)
+                                #endif
                             Text("minutes")
                         }
                         
                         HStack {
                             TextField("Distance", text: $distance)
+                                #if os(iOS)
                                 .keyboardType(.decimalPad)
+                                #endif
                             Text("km")
                         }
                     }

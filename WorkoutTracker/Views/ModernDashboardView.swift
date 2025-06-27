@@ -39,8 +39,10 @@ struct ModernDashboardView: View {
                     .padding(.vertical)
                 }
             }
+            #if os(iOS)
             .navigationBarBackButtonHidden(true)
             .toolbar(.hidden, for: .navigationBar)
+            #endif
             .onAppear { updateGreeting() }
         }
     }

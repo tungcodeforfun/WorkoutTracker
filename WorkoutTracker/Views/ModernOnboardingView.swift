@@ -34,7 +34,9 @@ struct ModernOnboardingView: View {
                     ReadyPage(username: username, trainerName: trainerName, viewModel: viewModel)
                         .tag(2)
                 }
+                #if os(iOS)
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                #endif
                 
                 HStack(spacing: Theme.Spacing.xSmall) {
                     ForEach(0..<3) { index in
