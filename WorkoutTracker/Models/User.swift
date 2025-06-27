@@ -7,6 +7,18 @@
 
 import Foundation
 
+/// Represents a user's complete profile and fitness journey in CompanionFit.
+/// 
+/// The User model encapsulates all user data including personal information, companion collection,
+/// workout history, achievements, and progression. All data is stored locally on the device using
+/// UserDefaults for privacy and simplicity.
+///
+/// Key features:
+/// - Companion management with active companion selection
+/// - Complete workout history tracking
+/// - Achievement and badge system
+/// - Level progression based on total experience
+/// - Friend system for future social features
 struct User: Identifiable, Codable {
     let id: UUID
     var username: String

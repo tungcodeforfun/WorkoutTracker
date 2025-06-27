@@ -8,16 +8,20 @@
 import Foundation
 import SwiftUI
 
+/// Represents the different elemental types that companions can have.
+/// Each type has unique visual characteristics and represents different training styles.
+
 enum CompanionType: String, CaseIterable, Codable {
-    case flame = "Flame"
-    case aqua = "Aqua"
-    case nature = "Nature"
-    case storm = "Storm"
-    case warrior = "Warrior"
-    case mystic = "Mystic"
-    case earth = "Earth"
-    case wind = "Wind"
+    case flame = "Flame"      /// Fire-type companions, passionate and energetic
+    case aqua = "Aqua"        /// Water-type companions, calm and flowing
+    case nature = "Nature"    /// Plant-type companions, growth and harmony focused
+    case storm = "Storm"      /// Electric-type companions, quick and powerful
+    case warrior = "Warrior"  /// Fighting-type companions, strength and discipline
+    case mystic = "Mystic"    /// Psychic-type companions, mental focus and clarity
+    case earth = "Earth"      /// Ground-type companions, stability and endurance
+    case wind = "Wind"        /// Flying-type companions, freedom and agility
     
+    /// Returns the signature color associated with each companion type
     var color: Color {
         switch self {
         case .flame: return Color(red: 1.00, green: 0.31, blue: 0.26)      // Modern red
@@ -32,6 +36,12 @@ enum CompanionType: String, CaseIterable, Codable {
     }
 }
 
+/// A digital training companion that grows stronger through workouts.
+/// Each companion has unique stats, elemental typing, and evolution potential.
+///
+/// Companions gain experience points (XP) when users complete workouts, allowing them to level up
+/// and eventually evolve into more powerful forms. This gamification system encourages consistent
+/// fitness activity by providing meaningful progression for the user's virtual partner.
 struct Companion: Identifiable, Codable {
     let id: UUID
     var name: String
