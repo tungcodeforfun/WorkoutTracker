@@ -8,14 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = AppViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if viewModel.currentUser != nil {
+            if viewModel.showingPokemonSelection {
+                ModernPokemonSelectionView(viewModel: viewModel)
+            } else {
+                ModernTabView(viewModel: viewModel)
+            }
+        } else {
+            ModernOnboardingView(viewModel: viewModel)
         }
-        .padding()
     }
 }
 
