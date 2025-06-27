@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import WorkoutTracker
 
 /// Main test suite for WorkoutTracker app
@@ -54,7 +55,7 @@ struct WorkoutTrackerTests {
     @Test func testCompleteUserJourneyWithEvolution() async throws {
         // Given - User with evolution-ready companion
         var user = User(username: "evotest", trainerName: "Evolution Tester")
-        var companion = Companion(name: "EvoStarter", type: .aqua, evolutionLevel: 2, evolvedForm: "EvoFinal")
+        let companion = Companion(name: "EvoStarter", type: .aqua, evolutionLevel: 2, evolvedForm: "EvoFinal")
         user.addCompanion(companion)
         
         // Create high-XP workout to trigger evolution
