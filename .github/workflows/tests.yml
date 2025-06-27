@@ -39,28 +39,26 @@ jobs:
         echo "Attempting to use iPhone 16 simulator: $DEVICE_ID"
         
         # First try with the specific iPhone 16 device
-        if timeout 900 xcodebuild \
+        if xcodebuild \
           -scheme WorkoutTracker \
           -destination "platform=iOS Simulator,id=$DEVICE_ID" \
           -configuration Debug \
           clean build test \
-          CODE_SIGNING_ALLOWED=NO \
-          -test-timeouts 300; then
+          CODE_SIGNING_ALLOWED=NO; then
           echo "Tests completed successfully with iPhone 16 simulator"
         else
-          echo "iPhone 16 simulator failed or timed out, trying with iPad simulator as fallback"
+          echo "iPhone 16 simulator failed, trying with iPad simulator as fallback"
           
           # Reset and try iPad
           xcrun simctl shutdown all
           xcrun simctl boot "$IPAD_ID" || echo "Failed to boot iPad simulator"
           
-          timeout 900 xcodebuild \
+          xcodebuild \
             -scheme WorkoutTracker \
             -destination "platform=iOS Simulator,id=$IPAD_ID" \
             -configuration Debug \
             clean build test \
-            CODE_SIGNING_ALLOWED=NO \
-            -test-timeouts 300
+            CODE_SIGNING_ALLOWED=NO
         fi
     
     - name: Upload Test Results
