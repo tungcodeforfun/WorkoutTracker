@@ -14,9 +14,23 @@ class AppViewModel: ObservableObject {
     @Published var selectedTab = 0
     @Published var showingCompanionSelection = false
     @Published var showingWorkoutCreation = false
+    @Published var healthKitManager = HealthKitManager()
+    @Published var healthKitEnabled = false
     
     init() {
         loadUser()
+        setupHealthKit()
+    }
+    
+    private func setupHealthKit() {
+        Task {
+            do {
+                try await healthKitManager.requestHealthKitPermissions()
+                healthKitEnabled = healthKitManager.authorizationStatus == .sharingAuthorized
+            } catch {
+                print("HealthKit setup failed: \(error)")
+            }
+        }
     }
     
     func createUser(username: String, trainerName: String) {
@@ -35,6 +49,17 @@ class AppViewModel: ObservableObject {
     func completeWorkout(_ workout: Workout) {
         currentUser?.completeWorkout(workout)
         saveUser()
+        
+        // Sync to HealthKit if enabled
+        if healthKitEnabled {
+            Task {
+                do {
+                    try await healthKitManager.saveWorkout(workout)
+                } catch {
+                    print("Failed to save workout to HealthKit: \(error)")
+                }
+            }
+        }
     }
     
     func setActiveCompanion(_ companionId: UUID) {
