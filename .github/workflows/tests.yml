@@ -37,10 +37,10 @@ jobs:
           CODE_SIGNING_ALLOWED=NO; then
           echo "Tests completed successfully with iPhone 16 simulator"
         else
-          echo "iPhone 16 simulator failed, trying with Any iOS Simulator Device"
+          echo "iPhone 16 simulator failed, trying with iPad simulator as fallback"
           xcodebuild \
             -scheme WorkoutTracker \
-            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+            -destination 'platform=iOS Simulator,id=2BF9F98D-7837-4C0F-BBC9-BDEAD8325D03' \
             -configuration Debug \
             clean build test \
             CODE_SIGNING_ALLOWED=NO
