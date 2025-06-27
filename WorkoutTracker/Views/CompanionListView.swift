@@ -60,13 +60,15 @@ struct CompanionListView: View {
                         } else {
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                                 ForEach(Array(user.companions.enumerated()), id: \.element.id) { index, companion in
-                                    CompanionDetailCard(
-                                        companion: companion,
-                                        isActive: companion.id == user.activeCompanionId
-                                    )
-                                    .onTapGesture {
+                                    Button(action: {
                                         selectedCompanion = companion
+                                    }) {
+                                        CompanionDetailCard(
+                                            companion: companion,
+                                            isActive: companion.id == user.activeCompanionId
+                                        )
                                     }
+                                    .buttonStyle(PlainButtonStyle())
                                     .opacity(showContent ? 1 : 0)
                                     .offset(y: showContent ? 0 : 30)
                                     .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(Double(index) * 0.1), value: showContent)
@@ -252,6 +254,7 @@ struct CompanionManagementSheet: View {
                     }
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.white.opacity(0.8))
+                    .buttonStyle(PlainButtonStyle())
                     
                     Spacer()
                     
@@ -269,6 +272,7 @@ struct CompanionManagementSheet: View {
                     }
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.blue)
+                    .buttonStyle(PlainButtonStyle())
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)

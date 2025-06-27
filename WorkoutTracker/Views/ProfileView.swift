@@ -11,6 +11,7 @@ struct ProfileView: View {
     @ObservedObject var viewModel: AppViewModel
     @State private var showingResetAlert = false
     @State private var showContent = false
+    @State private var showingHealthKitSettings = false
     
     var body: some View {
         ZStack {
@@ -30,6 +31,15 @@ struct ProfileView: View {
                         .foregroundColor(.white)
                     
                     Spacer()
+                    
+                    Button {
+                        showingHealthKitSettings = true
+                    } label: {
+                        Image(systemName: "heart.fill")
+                            .font(.title2)
+                            .foregroundColor(viewModel.healthKitEnabled ? .red : .white.opacity(0.6))
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
@@ -86,6 +96,7 @@ struct ProfileView: View {
                                         )
                                 )
                             }
+                            .buttonStyle(PlainButtonStyle())
                             .padding(.horizontal, 24)
                             .padding(.top, 20)
                             .opacity(showContent ? 1 : 0)
@@ -103,6 +114,10 @@ struct ProfileView: View {
             }
         } message: {
             Text("This will delete all your data including companions, workouts, and badges. This cannot be undone.")
+        }
+        .sheet(isPresented: $showingHealthKitSettings) {
+            HealthKitSettingsView()
+                .environmentObject(viewModel)
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
