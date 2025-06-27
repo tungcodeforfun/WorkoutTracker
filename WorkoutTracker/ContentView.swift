@@ -12,8 +12,8 @@ struct ContentView: View {
     
     var body: some View {
         if viewModel.currentUser != nil {
-            if viewModel.showingPokemonSelection {
-                ModernPokemonSelectionView(viewModel: viewModel)
+            if viewModel.showingCompanionSelection {
+                ModernCompanionSelectionView(viewModel: viewModel)
             } else {
                 ModernTabView(viewModel: viewModel)
             }

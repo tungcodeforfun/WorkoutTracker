@@ -21,7 +21,7 @@ struct ModernTabView: View {
                 }
                 .tag(0)
             
-            WorkoutView(viewModel: viewModel)
+            ModernWorkoutView(viewModel: viewModel)
                 .tabItem {
                     VStack {
                         Image(systemName: viewModel.selectedTab == 1 ? "figure.run" : "figure.walk")
@@ -30,11 +30,11 @@ struct ModernTabView: View {
                 }
                 .tag(1)
             
-            PokemonListView(viewModel: viewModel)
+            CompanionListView(viewModel: viewModel)
                 .tabItem {
                     VStack {
-                        Image(systemName: viewModel.selectedTab == 2 ? "sparkles" : "sparkle")
-                        Text("Pokemon")
+                        Image(systemName: viewModel.selectedTab == 2 ? "sparkles" : "sparkles")
+                        Text("Companions")
                     }
                 }
                 .tag(2)
@@ -48,7 +48,7 @@ struct ModernTabView: View {
                 }
                 .tag(3)
         }
-        .tint(Theme.Colors.accent)
+        .tint(Color.blue)
     }
 }
 

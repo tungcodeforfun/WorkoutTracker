@@ -26,6 +26,7 @@ struct Theme {
         static let success = Color(red: 0.2, green: 0.8, blue: 0.4)
         static let warning = Color(red: 1.0, green: 0.6, blue: 0.2)
         static let error = Color(red: 0.9, green: 0.3, blue: 0.3)
+        static let shadow = Color.black.opacity(0.06)
     }
     
     struct Spacing {
@@ -64,6 +65,7 @@ extension View {
             .background(Theme.gradient)
             .cornerRadius(Theme.CornerRadius.medium)
             .shadow(color: Theme.Colors.accent.opacity(0.3), radius: 8, x: 0, y: 4)
+            .buttonStyle(PlainButtonStyle())
     }
     
     func secondaryButtonStyle() -> some View {
@@ -76,6 +78,7 @@ extension View {
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
                     .stroke(Theme.Colors.accent, lineWidth: 2)
             )
+            .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -83,11 +86,6 @@ struct ModernCardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(Theme.Spacing.medium)
-            .background(
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                    .fill(Theme.Colors.surface)
-                    .shadow(color: Theme.cardShadow, radius: 8, x: 0, y: 2)
-            )
     }
 }
 
