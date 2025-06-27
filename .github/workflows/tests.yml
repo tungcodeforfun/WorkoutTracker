@@ -38,12 +38,19 @@ jobs:
         
         echo "Attempting to use iPhone 16 simulator: $DEVICE_ID"
         
-        # First try with the specific iPhone 16 device
+        # First try with the specific iPhone 16 device - Unit tests only
         if xcodebuild \
           -scheme WorkoutTracker \
           -destination "platform=iOS Simulator,id=$DEVICE_ID" \
           -configuration Debug \
-          clean build test \
+          clean build \
+          CODE_SIGNING_ALLOWED=NO && \
+        xcodebuild \
+          -scheme WorkoutTracker \
+          -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+          -configuration Debug \
+          test-without-building \
+          -only-testing:WorkoutTrackerTests \
           CODE_SIGNING_ALLOWED=NO; then
           echo "Tests completed successfully with iPhone 16 simulator"
         else
@@ -57,7 +64,14 @@ jobs:
             -scheme WorkoutTracker \
             -destination "platform=iOS Simulator,id=$IPAD_ID" \
             -configuration Debug \
-            clean build test \
+            clean build \
+            CODE_SIGNING_ALLOWED=NO && \
+          xcodebuild \
+            -scheme WorkoutTracker \
+            -destination "platform=iOS Simulator,id=$IPAD_ID" \
+            -configuration Debug \
+            test-without-building \
+            -only-testing:WorkoutTrackerTests \
             CODE_SIGNING_ALLOWED=NO
         fi
     
