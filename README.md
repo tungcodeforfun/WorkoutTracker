@@ -3,13 +3,15 @@
 > Transform your workouts into an adventure with your digital training companions!
 
 [![iOS](https://img.shields.io/badge/iOS-15.0+-blue.svg)](https://developer.apple.com/ios/)
+[![watchOS](https://img.shields.io/badge/watchOS-8.0+-red.svg)](https://developer.apple.com/watchos/)
 [![Swift](https://img.shields.io/badge/Swift-5.5+-orange.svg)](https://swift.org/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-4.0+-green.svg)](https://developer.apple.com/xcode/swiftui/)
+[![HealthKit](https://img.shields.io/badge/HealthKit-Integrated-brightgreen.svg)](https://developer.apple.com/healthkit/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Overview
 
-CompanionFit is an innovative iOS fitness app that gamifies your workout experience by pairing you with digital training companions. Each workout earns XP that helps your companions grow stronger and evolve, creating a motivating and engaging fitness journey.
+CompanionFit is an innovative iOS and watchOS fitness app that gamifies your workout experience by pairing you with digital training companions. Each workout earns XP that helps your companions grow stronger and evolve, creating a motivating and engaging fitness journey across all your Apple devices.
 
 ### Key Features
 
@@ -17,8 +19,10 @@ CompanionFit is an innovative iOS fitness app that gamifies your workout experie
 - 🦸 **Companion System**: Choose from 8 unique starter companions with different elemental types
 - 📊 **Comprehensive Tracking**: Log strength training, cardio, flexibility, and sports activities
 - 🏆 **Achievement System**: Unlock badges for various fitness milestones
+- ⌚ **Apple Watch Support**: Full workout tracking on your wrist with real-time metrics
+- 🍎 **HealthKit Integration**: Seamlessly sync workouts with Apple Health
 - 📱 **Modern Design**: Beautiful, intuitive interface with dark mode support
-- 💾 **Local Storage**: All data stored securely on your device
+- 💾 **Cross-Device Sync**: Data synchronization between iPhone and Apple Watch
 
 ## Screenshots
 
@@ -26,9 +30,16 @@ CompanionFit is an innovative iOS fitness app that gamifies your workout experie
 
 ## Requirements
 
-- iOS 15.0 or later
-- Xcode 14.0 or later (for development)
+### Device Requirements
+- iOS 15.0 or later (iPhone)
+- watchOS 8.0 or later (Apple Watch) - Optional
+- Apple Health app for workout syncing
+
+### Development Requirements
+- Xcode 16.0 or later
 - Swift 5.5 or later
+- iOS 15.0+ SDK
+- HealthKit entitlements
 
 ## Installation
 
@@ -66,12 +77,19 @@ WorkoutTracker/
 │   ├── ModernDashboardView.swift
 │   ├── ModernWorkoutView.swift
 │   ├── CompanionListView.swift
+│   ├── HealthKitSettingsView.swift
 │   └── ...
 ├── ViewModels/           # Business logic
 │   └── AppViewModel.swift
+├── Managers/             # Service managers
+│   └── HealthKitManager.swift
 ├── Design/               # Theme and styling
 │   └── Theme.swift
-└── ...
+└── WorkoutTracker Watch App/  # watchOS app
+    ├── WatchContentView.swift
+    ├── WatchWorkoutManager.swift
+    ├── WatchActiveWorkoutView.swift
+    └── ...
 ```
 
 ## Core Components
@@ -86,6 +104,14 @@ WorkoutTracker/
 - **Exercise Types**: Strength, Cardio, Flexibility, Sports, Other
 - **Comprehensive Logging**: Sets, reps, weight, duration, distance, notes
 - **XP Calculation**: Dynamic XP based on exercise type and performance
+- **Apple Watch Integration**: Full workout tracking on watchOS
+- **HealthKit Sync**: Automatic syncing with Apple Health
+
+### Health & Fitness Integration
+- **HealthKit Support**: Read and write workout data
+- **Real-time Metrics**: Heart rate and calorie tracking during workouts
+- **Cross-platform**: Seamless experience between iPhone and Apple Watch
+- **Privacy First**: All health data stays on your device and personal iCloud
 - **Real-time Tracking**: Built-in timer and pause functionality
 
 ### Achievement System
