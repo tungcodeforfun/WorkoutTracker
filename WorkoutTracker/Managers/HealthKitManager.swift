@@ -34,6 +34,11 @@ class HealthKitManager: ObservableObject {
     ]
     
     init() {
+        // Skip HealthKit initialization in test environment
+        guard !ProcessInfo.processInfo.environment.keys.contains("XCTestConfigurationFilePath") else {
+            isHealthKitAvailable = false
+            return
+        }
         checkHealthKitSupport()
     }
     

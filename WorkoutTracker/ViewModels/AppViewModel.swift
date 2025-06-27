@@ -23,12 +23,19 @@ class AppViewModel: ObservableObject {
     }
     
     private func setupHealthKit() {
+        // Skip HealthKit setup in testing environment or if not available
+        guard !ProcessInfo.processInfo.environment.keys.contains("XCTestConfigurationFilePath") else {
+            print("Skipping HealthKit setup in test environment")
+            return
+        }
+        
         Task {
             do {
                 try await healthKitManager.requestHealthKitPermissions()
                 healthKitEnabled = healthKitManager.authorizationStatus == .sharingAuthorized
             } catch {
                 print("HealthKit setup failed: \(error)")
+                healthKitEnabled = false
             }
         }
     }
