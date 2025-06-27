@@ -39,7 +39,7 @@ struct PokemonListView: View {
                             .padding(.vertical, 6)
                             .background(
                                 Capsule()
-                                    .fill(Color.white.opacity(0.2))
+                                    .fill(Color.clear)
                             )
                     }
                 }
@@ -154,7 +154,7 @@ struct PokemonDetailCard: View {
                         .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(Color.white.opacity(0.2))
+                                .fill(Color.clear)
                         )
                 }
             }
@@ -173,32 +173,21 @@ struct PokemonDetailCard: View {
                         .foregroundColor(.white)
                 }
                 
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white.opacity(0.2))
-                            .frame(height: 6)
-                        
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(pokemon.type.color)
-                            .frame(
-                                width: geometry.size.width * (Double(pokemon.experience) / Double(pokemon.experienceForNextLevel())),
-                                height: 6
-                            )
-                            .animation(.spring(response: 1.0, dampingFraction: 0.8), value: pokemon.experience)
-                    }
-                }
-                .frame(height: 6)
+                MiniProgressBar(
+                    value: Double(pokemon.experience),
+                    maxValue: Double(pokemon.experienceForNextLevel()),
+                    color: pokemon.type.color
+                )
             }
         }
         .padding(16)
         .frame(height: 240)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white.opacity(0.1))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(isActive ? LinearGradient(colors: [Color.green, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [Color.white.opacity(0.3), Color.white.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: isActive ? 2 : 1)
+                        .stroke(isActive ? LinearGradient(colors: [Color.green, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [Color.white.opacity(0.3), Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: isActive ? 2 : 1)
                 )
         )
         .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 5)
@@ -211,7 +200,7 @@ struct EmptyPokemonState: View {
         VStack(spacing: 24) {
             ZStack {
                 Circle()
-                    .fill(Color.white.opacity(0.1))
+                    .fill(Color.clear)
                     .frame(width: 120, height: 120)
                 
                 Image(systemName: "sparkles")
@@ -328,7 +317,7 @@ struct PokemonManagementSheet: View {
                         .padding(16)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.1))
+                                .fill(Color.clear)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color.white.opacity(0.3), lineWidth: 1)
@@ -399,12 +388,36 @@ struct StatRow: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.1))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(color.opacity(0.3), lineWidth: 1)
                 )
         )
+    }
+}
+
+struct MiniProgressBar: View {
+    let value: Double
+    let maxValue: Double
+    let color: Color
+    
+    private var progress: Double {
+        guard maxValue > 0 else { return 0 }
+        return min(max(0, value / maxValue), 1.0)
+    }
+    
+    var body: some View {
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 3)
+                .stroke(color.opacity(0.3), lineWidth: 1)
+                .frame(height: 6)
+            
+            RoundedRectangle(cornerRadius: 3)
+                .fill(color)
+                .frame(width: 140 * progress, height: 6)
+        }
+        .frame(width: 140, height: 6)
     }
 }
 

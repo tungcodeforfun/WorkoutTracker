@@ -139,7 +139,7 @@ struct ModernPokemonCard: View {
                             .padding(.vertical, 6)
                             .background(
                                 Capsule()
-                                    .fill(pokemon.type.color.opacity(0.2))
+                                    .stroke(pokemon.type.color.opacity(0.3), lineWidth: 1)
                             )
                         
                         Text(pokemon.type.rawValue)
@@ -153,10 +153,9 @@ struct ModernPokemonCard: View {
                 // Pokemon Avatar
                 ZStack {
                     Circle()
-                        .fill(pokemon.type.color.opacity(0.3))
+                        .stroke(pokemon.type.color.opacity(0.4), lineWidth: 2)
                         .frame(width: 80, height: 80)
-                        .scaleEffect(isAnimating ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: isAnimating)
+                        .scaleEffect(isAnimating ? 1.05 : 1.0)
                     
                     Text(String(pokemon.name.prefix(1)))
                         .font(.system(size: 32, weight: .bold))
@@ -179,18 +178,11 @@ struct ModernPokemonCard: View {
                         .foregroundColor(.white)
                 }
                 
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.white.opacity(0.2))
-                            .frame(height: 8)
-                        
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(LinearGradient(colors: [pokemon.type.color, pokemon.type.color.opacity(0.7)], startPoint: .leading, endPoint: .trailing))
-                            .frame(width: geometry.size.width * (Double(pokemon.experience) / Double(pokemon.experienceForNextLevel())), height: 8)
-                            .animation(.spring(response: 1.0, dampingFraction: 0.8), value: pokemon.experience)
-                    }
-                }
+                ProgressBar(
+                    value: Double(pokemon.experience),
+                    maxValue: Double(pokemon.experienceForNextLevel()),
+                    color: pokemon.type.color
+                )
                 .frame(height: 8)
             }
             .padding(.horizontal, 24)
@@ -198,14 +190,18 @@ struct ModernPokemonCard: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white.opacity(0.1))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        .stroke(Color.clear, lineWidth: 1)
                 )
         )
         .shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 8)
-        .onAppear { isAnimating = true }
+        .onAppear { 
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                isAnimating = true 
+            }
+        }
     }
 }
 
@@ -243,7 +239,7 @@ struct QuickActionButton: View {
             VStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(color.opacity(0.2))
+                        .stroke(color.opacity(0.3), lineWidth: 1.5)
                         .frame(width: 48, height: 48)
                     
                     Image(systemName: icon)
@@ -260,10 +256,10 @@ struct QuickActionButton: View {
             .frame(height: 100)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(0.1))
+                    .fill(Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            .stroke(Color.clear, lineWidth: 1)
                     )
             )
             .scaleEffect(isPressed ? 0.95 : 1.0)
@@ -309,7 +305,7 @@ struct StatCard: View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(color.opacity(0.2))
+                    .stroke(color.opacity(0.3), lineWidth: 1.5)
                     .frame(width: 40, height: 40)
                 
                 Image(systemName: icon)
@@ -330,10 +326,10 @@ struct StatCard: View {
         .frame(width: 100, height: 100)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.1))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        .stroke(Color.clear, lineWidth: 1)
                 )
         )
     }
@@ -368,7 +364,7 @@ struct ModernWorkoutRow: View {
         HStack(spacing: 16) {
             ZStack {
                 Circle()
-                    .fill(Color.green.opacity(0.2))
+                    .stroke(Color.green.opacity(0.3), lineWidth: 1.5)
                     .frame(width: 40, height: 40)
                 
                 Image(systemName: "checkmark")
@@ -401,10 +397,10 @@ struct ModernWorkoutRow: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.1))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        .stroke(Color.clear, lineWidth: 1)
                 )
         )
     }
@@ -432,10 +428,10 @@ struct EmptyStateCard: View {
         .padding(32)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.1))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        .stroke(Color.clear, lineWidth: 1)
                 )
         )
     }
@@ -448,6 +444,34 @@ extension View {
                 .onChanged { _ in onPress() }
                 .onEnded { _ in onRelease() }
         )
+    }
+}
+
+struct ProgressBar: View {
+    let value: Double
+    let maxValue: Double
+    let color: Color
+    
+    private var progress: Double {
+        guard maxValue > 0 else { return 0 }
+        return min(max(0, value / maxValue), 1.0)
+    }
+    
+    var body: some View {
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                .frame(height: 8)
+            
+            RoundedRectangle(cornerRadius: 4)
+                .fill(LinearGradient(
+                    colors: [color, color.opacity(0.7)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                ))
+                .frame(width: 200 * progress, height: 8)
+        }
+        .frame(width: 200, height: 8)
     }
 }
 

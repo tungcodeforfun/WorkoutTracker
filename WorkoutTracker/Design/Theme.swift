@@ -84,14 +84,6 @@ struct ModernCardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(Theme.Spacing.medium)
-            .background(
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                    .fill(Color.white.opacity(0.03))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                    )
-            )
     }
 }
 

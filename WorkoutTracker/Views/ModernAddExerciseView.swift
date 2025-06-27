@@ -108,7 +108,6 @@ extension ModernAddExerciseView {
             exerciseTypeSelector
         }
         .padding(Theme.Spacing.medium)
-        .background(cardBackground)
     }
     
     private var exercisePickerMenu: some View {
@@ -140,11 +139,7 @@ extension ModernAddExerciseView {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                    .fill(Color.white.opacity(0.03))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
             )
         }
     }
@@ -158,11 +153,7 @@ extension ModernAddExerciseView {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                    .fill(Color.white.opacity(0.03))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
             )
     }
     
@@ -206,7 +197,6 @@ extension ModernAddExerciseView {
             notesField
         }
         .padding(Theme.Spacing.medium)
-        .background(cardBackground)
     }
     
     private var strengthFields: some View {
@@ -255,11 +245,7 @@ extension ModernAddExerciseView {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                        .fill(Color.white.opacity(0.03))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                        )
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
                 )
         }
     }
@@ -290,16 +276,11 @@ extension ModernAddExerciseView {
             }
         }
         .padding(Theme.Spacing.medium)
-        .background(cardBackground)
     }
     
     private var cardBackground: some View {
         RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-            .fill(Color.white.opacity(0.02))
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                    .stroke(Color.white.opacity(0.03), lineWidth: 1)
-            )
+            .fill(Color.clear)
     }
 }
 
@@ -363,7 +344,11 @@ struct ExerciseTypeChip: View {
                 .padding(.vertical, Theme.Spacing.small)
                 .background(
                     Capsule()
-                        .fill(isSelected ? chipColor : chipColor.opacity(0.1))
+                        .fill(isSelected ? chipColor : Color.clear)
+                        .overlay(
+                            Capsule()
+                                .stroke(chipColor.opacity(0.3), lineWidth: 1)
+                        )
                 )
         }
     }

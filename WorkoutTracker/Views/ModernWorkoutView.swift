@@ -100,14 +100,7 @@ struct ModernStartWorkoutView: View {
                     // Pokemon avatar
                     ZStack {
                         Circle()
-                            .fill(
-                                RadialGradient(
-                                    colors: [pokemon.type.color.opacity(0.3), pokemon.type.color.opacity(0.1)],
-                                    center: .center,
-                                    startRadius: 20,
-                                    endRadius: 80
-                                )
-                            )
+                            .stroke(pokemon.type.color.opacity(0.3), lineWidth: 2)
                             .frame(width: 160, height: 160)
                             .scaleEffect(pulseAnimation ? 1.1 : 1.0)
                         
@@ -201,7 +194,7 @@ struct WorkoutBenefit: View {
                 .frame(width: 32, height: 32)
                 .background(
                     Circle()
-                        .fill(color.opacity(0.1))
+                        .stroke(color.opacity(0.3), lineWidth: 1)
                 )
             
             Text(text)
@@ -267,7 +260,7 @@ struct ModernActiveWorkoutView: View {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                        .fill(Color.white.opacity(0.03))
+                        .fill(Color.clear)
                         .overlay(
                             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
                                 .stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -310,7 +303,7 @@ struct ModernActiveWorkoutView: View {
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                                .fill(Color.white.opacity(0.03))
+                                .fill(Color.clear)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
                                         .stroke(Color.blue.opacity(0.5), lineWidth: 1)
@@ -366,7 +359,7 @@ struct ModernActiveWorkoutView: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(0.03))
+                    .fill(Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -418,7 +411,7 @@ struct ModernPokemonWorkoutHeader: View {
             // Pokemon avatar (smaller for header)
             ZStack {
                 Circle()
-                    .fill(pokemon.type.color.opacity(0.2))
+                    .stroke(pokemon.type.color.opacity(0.3), lineWidth: 2)
                     .frame(width: 60, height: 60)
                     .scaleEffect(isAnimating ? 1.05 : 1.0)
                 
@@ -445,7 +438,7 @@ struct ModernPokemonWorkoutHeader: View {
                     .padding(.vertical, 2)
                     .background(
                         Capsule()
-                            .fill((isPaused ? Color.orange : pokemon.type.color).opacity(0.1))
+                            .stroke((isPaused ? Color.orange : pokemon.type.color).opacity(0.3), lineWidth: 1)
                     )
             }
             
@@ -467,7 +460,7 @@ struct ModernPokemonWorkoutHeader: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                .fill(Color.white.opacity(0.03))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
                         .stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -500,7 +493,7 @@ struct ModernExerciseCard: View {
                 .padding(.vertical, 4)
                 .background(
                     Capsule()
-                        .fill(Theme.Colors.success.opacity(0.1))
+                        .stroke(Theme.Colors.success.opacity(0.3), lineWidth: 1)
                 )
             }
             
@@ -526,7 +519,7 @@ struct ModernExerciseCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                .fill(Color.white.opacity(0.03))
+                .fill(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
                         .stroke(Color.white.opacity(0.2), lineWidth: 1)
@@ -553,7 +546,7 @@ struct ExerciseDetailChip: View {
         .padding(.vertical, 4)
         .background(
             Capsule()
-                .fill(color.opacity(0.1))
+                .stroke(color.opacity(0.3), lineWidth: 1)
         )
     }
 }
@@ -621,7 +614,7 @@ struct WorkoutCompletionOverlay: View {
                     // Success animation
                     ZStack {
                         Circle()
-                            .fill(Theme.Colors.success.opacity(0.2))
+                            .stroke(Theme.Colors.success.opacity(0.4), lineWidth: 2)
                             .frame(width: 120, height: 120)
                             .scaleEffect(animationPhase >= 1 ? 1.2 : 0.8)
                         
