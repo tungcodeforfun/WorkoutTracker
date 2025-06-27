@@ -20,30 +20,47 @@ jobs:
     - name: List Available Simulators
       run: xcrun simctl list devices available
     
+    - name: Reset Simulators
+      run: |
+        echo "Resetting all simulators to clean state..."
+        xcrun simctl shutdown all
+        xcrun simctl erase all
+        
     - name: Build and Test
+      timeout-minutes: 20
       run: |
         # Use a known iPhone 16 simulator ID from the available destinations
-        # From the output, we can see iPhone 16 with iOS 18.4 is available
         DEVICE_ID="1565B47A-C01C-4B4C-B660-9A278E27558D"
+        IPAD_ID="2BF9F98D-7837-4C0F-BBC9-BDEAD8325D03"
+        
+        echo "Starting simulator boot process..."
+        xcrun simctl boot "$DEVICE_ID" || echo "Failed to boot iPhone 16 simulator"
         
         echo "Attempting to use iPhone 16 simulator: $DEVICE_ID"
         
         # First try with the specific iPhone 16 device
-        if xcodebuild \
+        if timeout 900 xcodebuild \
           -scheme WorkoutTracker \
           -destination "platform=iOS Simulator,id=$DEVICE_ID" \
           -configuration Debug \
           clean build test \
-          CODE_SIGNING_ALLOWED=NO; then
+          CODE_SIGNING_ALLOWED=NO \
+          -test-timeouts 300; then
           echo "Tests completed successfully with iPhone 16 simulator"
         else
-          echo "iPhone 16 simulator failed, trying with iPad simulator as fallback"
-          xcodebuild \
+          echo "iPhone 16 simulator failed or timed out, trying with iPad simulator as fallback"
+          
+          # Reset and try iPad
+          xcrun simctl shutdown all
+          xcrun simctl boot "$IPAD_ID" || echo "Failed to boot iPad simulator"
+          
+          timeout 900 xcodebuild \
             -scheme WorkoutTracker \
-            -destination 'platform=iOS Simulator,id=2BF9F98D-7837-4C0F-BBC9-BDEAD8325D03' \
+            -destination "platform=iOS Simulator,id=$IPAD_ID" \
             -configuration Debug \
             clean build test \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            -test-timeouts 300
         fi
     
     - name: Upload Test Results
