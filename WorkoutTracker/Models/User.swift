@@ -13,8 +13,8 @@ struct User: Identifiable, Codable {
     var trainerName: String
     var level: Int
     var totalExperience: Int
-    var pokemon: [Pokemon]
-    var activePokemonId: UUID?
+    var companions: [Companion]
+    var activeCompanionId: UUID?
     var workouts: [Workout]
     var badges: [Badge]
     var friends: [UUID]
@@ -26,45 +26,45 @@ struct User: Identifiable, Codable {
         self.trainerName = trainerName
         self.level = 1
         self.totalExperience = 0
-        self.pokemon = []
+        self.companions = []
         self.workouts = []
         self.badges = []
         self.friends = []
         self.joinDate = Date()
     }
     
-    var activePokemon: Pokemon? {
-        guard let activePokemonId = activePokemonId else { return nil }
-        return pokemon.first { $0.id == activePokemonId }
+    var activeCompanion: Companion? {
+        guard let activeCompanionId = activeCompanionId else { return nil }
+        return companions.first { $0.id == activeCompanionId }
     }
     
-    mutating func addPokemon(_ newPokemon: Pokemon) {
-        pokemon.append(newPokemon)
-        if activePokemonId == nil {
-            activePokemonId = newPokemon.id
+    mutating func addCompanion(_ newCompanion: Companion) {
+        companions.append(newCompanion)
+        if activeCompanionId == nil {
+            activeCompanionId = newCompanion.id
         }
     }
     
-    mutating func setActivePokemon(_ pokemonId: UUID) {
-        activePokemonId = pokemonId
+    mutating func setActiveCompanion(_ companionId: UUID) {
+        activeCompanionId = companionId
     }
     
-    mutating func updatePokemonNickname(_ pokemonId: UUID, nickname: String) {
-        if let index = pokemon.firstIndex(where: { $0.id == pokemonId }) {
-            pokemon[index].nickname = nickname
+    mutating func updateCompanionNickname(_ companionId: UUID, nickname: String) {
+        if let index = companions.firstIndex(where: { $0.id == companionId }) {
+            companions[index].nickname = nickname
         }
     }
     
     mutating func completeWorkout(_ workout: Workout) {
         var updatedWorkout = workout
-        updatedWorkout.pokemonUsed = activePokemonId
+        updatedWorkout.companionUsed = activeCompanionId
         workouts.append(updatedWorkout)
         
         let experienceGained = workout.totalExperience
         totalExperience += experienceGained
         
-        if let index = pokemon.firstIndex(where: { $0.id == activePokemonId }) {
-            pokemon[index].gainExperience(experienceGained)
+        if let index = companions.firstIndex(where: { $0.id == activeCompanionId }) {
+            companions[index].gainExperience(experienceGained)
         }
         
         checkForLevelUp()
@@ -87,7 +87,7 @@ struct User: Identifiable, Codable {
             badges.append(Badge(type: .monthStreak))
         }
         
-        if pokemon.contains(where: { $0.level >= 10 }) && !badges.contains(where: { $0.type == .firstEvolution }) {
+        if companions.contains(where: { $0.level >= 10 }) && !badges.contains(where: { $0.type == .firstEvolution }) {
             badges.append(Badge(type: .firstEvolution))
         }
         
@@ -136,7 +136,7 @@ enum BadgeType: String, CaseIterable, Codable {
         switch self {
         case .weekStreak: return "Complete 7 workouts"
         case .monthStreak: return "Complete 30 workouts"
-        case .firstEvolution: return "Evolve your first Pokemon"
+        case .firstEvolution: return "Evolve your first Companion"
         case .strongLifter: return "Lift 10,000 kg total"
         case .marathoner: return "Run 100 km total"
         }

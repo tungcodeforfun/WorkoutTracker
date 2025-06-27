@@ -102,7 +102,7 @@ struct ProfileView: View {
                 viewModel.resetUser()
             }
         } message: {
-            Text("This will delete all your data including Pokemon, workouts, and badges. This cannot be undone.")
+            Text("This will delete all your data including companions, workouts, and badges. This cannot be undone.")
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -173,9 +173,9 @@ struct StatsSection: View {
             
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                 StatItem(icon: "figure.run", title: "Workouts", value: "\(user.workouts.count)", color: .blue)
-                StatItem(icon: "sparkles", title: "Pokemon", value: "\(user.pokemon.count)", color: .purple)
+                StatItem(icon: "sparkles", title: "Companions", value: "\(user.companions.count)", color: .purple)
                 StatItem(icon: "trophy.fill", title: "Badges", value: "\(user.badges.count)", color: .orange)
-                StatItem(icon: "flame.fill", title: "Total XP", value: "\(user.pokemon.reduce(0) { $0 + $1.experience })", color: .red)
+                StatItem(icon: "flame.fill", title: "Total XP", value: "\(user.companions.reduce(0) { $0 + $1.experience })", color: .red)
             }
             .padding(.horizontal, 24)
         }

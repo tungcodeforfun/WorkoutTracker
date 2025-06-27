@@ -12,7 +12,7 @@ import SwiftUI
 class AppViewModel: ObservableObject {
     @Published var currentUser: User?
     @Published var selectedTab = 0
-    @Published var showingPokemonSelection = false
+    @Published var showingCompanionSelection = false
     @Published var showingWorkoutCreation = false
     
     init() {
@@ -22,13 +22,13 @@ class AppViewModel: ObservableObject {
     func createUser(username: String, trainerName: String) {
         let newUser = User(username: username, trainerName: trainerName)
         currentUser = newUser
-        showingPokemonSelection = true
+        showingCompanionSelection = true
         saveUser()
     }
     
-    func selectStarterPokemon(_ pokemon: Pokemon) {
-        currentUser?.addPokemon(pokemon)
-        showingPokemonSelection = false
+    func selectStarterCompanion(_ companion: Companion) {
+        currentUser?.addCompanion(companion)
+        showingCompanionSelection = false
         saveUser()
     }
     
@@ -37,13 +37,13 @@ class AppViewModel: ObservableObject {
         saveUser()
     }
     
-    func setActivePokemon(_ pokemonId: UUID) {
-        currentUser?.setActivePokemon(pokemonId)
+    func setActiveCompanion(_ companionId: UUID) {
+        currentUser?.setActiveCompanion(companionId)
         saveUser()
     }
     
-    func updatePokemonNickname(_ pokemonId: UUID, nickname: String) {
-        currentUser?.updatePokemonNickname(pokemonId, nickname: nickname)
+    func updateCompanionNickname(_ companionId: UUID, nickname: String) {
+        currentUser?.updateCompanionNickname(companionId, nickname: nickname)
         saveUser()
     }
     

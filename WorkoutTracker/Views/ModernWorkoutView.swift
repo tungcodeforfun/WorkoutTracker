@@ -30,14 +30,14 @@ struct ModernWorkoutView: View {
                 ModernActiveWorkoutView(
                     workout: $currentWorkout,
                     startTime: workoutStartTime,
-                    activePokemon: viewModel.currentUser?.activePokemon,
+                    activeCompanion: viewModel.currentUser?.activeCompanion,
                     isPaused: $isPaused,
                     onAddExercise: { showingExerciseSheet = true },
                     onFinish: finishWorkout
                 )
             } else {
                 ModernStartWorkoutView(
-                    activePokemon: viewModel.currentUser?.activePokemon,
+                    activeCompanion: viewModel.currentUser?.activeCompanion,
                     onStart: startWorkout
                 )
             }
@@ -77,7 +77,7 @@ struct ModernWorkoutView: View {
 }
 
 struct ModernStartWorkoutView: View {
-    let activePokemon: Pokemon?
+    let activeCompanion: Companion?
     let onStart: () -> Void
     @State private var pulseAnimation = false
     
@@ -94,19 +94,19 @@ struct ModernStartWorkoutView: View {
             VStack(spacing: Theme.Spacing.xLarge) {
                 Spacer()
             
-            // Pokemon motivation section
-            if let pokemon = activePokemon {
+            // Companion motivation section
+            if let companion = activeCompanion {
                 VStack(spacing: Theme.Spacing.large) {
-                    // Pokemon avatar
+                    // Companion avatar
                     ZStack {
                         Circle()
-                            .stroke(pokemon.type.color.opacity(0.3), lineWidth: 2)
+                            .stroke(companion.type.color.opacity(0.3), lineWidth: 2)
                             .frame(width: 160, height: 160)
                             .scaleEffect(pulseAnimation ? 1.1 : 1.0)
                         
-                        Text(String(pokemon.name.prefix(1)))
+                        Text(String(companion.name.prefix(1)))
                             .font(.system(size: 80, weight: .bold, design: .rounded))
-                            .foregroundColor(pokemon.type.color)
+                            .foregroundColor(companion.type.color)
                     }
                     .onAppear {
                         withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
@@ -115,13 +115,13 @@ struct ModernStartWorkoutView: View {
                     }
                     
                     VStack(spacing: Theme.Spacing.small) {
-                        Text("\(pokemon.nickname ?? pokemon.name) is ready to train!")
+                        Text("\(companion.nickname ?? companion.name) is ready to train!")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                         
-                        Text("Level \(pokemon.level) • \(pokemon.experience)/\(pokemon.experienceForNextLevel()) XP")
+                        Text("Level \(companion.level) • \(companion.experience)/\(companion.experienceForNextLevel()) XP")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -135,7 +135,7 @@ struct ModernStartWorkoutView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
-                Text("Every rep makes your Pokemon stronger!")
+                Text("Every rep makes your Companion stronger!")
                     .font(.body)
                     .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
@@ -145,7 +145,7 @@ struct ModernStartWorkoutView: View {
             
             // Workout benefits
             VStack(spacing: Theme.Spacing.medium) {
-                WorkoutBenefit(icon: "bolt.fill", text: "Gain XP for your Pokemon", color: Theme.Colors.warning)
+                WorkoutBenefit(icon: "bolt.fill", text: "Gain XP for your Companion", color: Theme.Colors.warning)
                 WorkoutBenefit(icon: "trophy.fill", text: "Unlock new achievements", color: Theme.Colors.accent)
                 WorkoutBenefit(icon: "heart.fill", text: "Get stronger together", color: .red)
             }
@@ -172,6 +172,7 @@ struct ModernStartWorkoutView: View {
                 .cornerRadius(16)
                 .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
             }
+            .buttonStyle(PlainButtonStyle())
             .padding(.horizontal)
             
                 Spacer()
@@ -210,7 +211,7 @@ struct WorkoutBenefit: View {
 struct ModernActiveWorkoutView: View {
     @Binding var workout: Workout
     let startTime: Date
-    let activePokemon: Pokemon?
+    let activeCompanion: Companion?
     @Binding var isPaused: Bool
     let onAddExercise: () -> Void
     let onFinish: () -> Void
@@ -232,30 +233,30 @@ struct ModernActiveWorkoutView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 0) {
-            // Header with Pokemon and timer
+            // Header with Companion and timer
             VStack(spacing: Theme.Spacing.medium) {
-                if let pokemon = activePokemon {
-                    ModernPokemonWorkoutHeader(pokemon: pokemon, elapsedTime: elapsedTime, isPaused: isPaused)
+                if let companion = activeCompanion {
+                    ModernCompanionWorkoutHeader(companion: companion, elapsedTime: elapsedTime, isPaused: isPaused)
                 }
                 
-                // XP Progress
-                VStack(spacing: Theme.Spacing.small) {
-                    HStack {
-                        Text("Workout XP")
+                // XP Earned
+                HStack {
+                    Image(systemName: "bolt.fill")
+                        .foregroundColor(.yellow)
+                        .font(.title2)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("XP Earned")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.8))
                         
-                        Spacer()
-                        
                         Text("\(workout.totalExperience) XP")
-                            .font(.headline)
+                            .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.green)
                     }
                     
-                    ProgressView(value: Double(workout.totalExperience), total: 100.0)
-                        .tint(Theme.Colors.success)
-                        .scaleEffect(y: 2)
+                    Spacer()
                 }
                 .padding()
                 .background(
@@ -310,6 +311,7 @@ struct ModernActiveWorkoutView: View {
                                 )
                         )
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 .padding(.horizontal)
             }
@@ -331,6 +333,7 @@ struct ModernActiveWorkoutView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color.white.opacity(0.3), lineWidth: 2)
                     )
+                    .buttonStyle(PlainButtonStyle())
                     
                     Button(action: onFinish) {
                         HStack(spacing: 8) {
@@ -352,6 +355,7 @@ struct ModernActiveWorkoutView: View {
                         .cornerRadius(12)
                         .shadow(color: Color.green.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
+                    .buttonStyle(PlainButtonStyle())
                     .disabled(workout.exercises.isEmpty)
                     .opacity(workout.exercises.isEmpty ? 0.6 : 1.0)
                 }
@@ -369,7 +373,7 @@ struct ModernActiveWorkoutView: View {
         }
         .onAppear { startTimer() }
         .onDisappear { stopTimer() }
-        .onChange(of: isPaused) { paused in
+        .onChange(of: isPaused) { _, paused in
             if paused {
                 pauseStartTime = Date()
             } else {
@@ -400,25 +404,25 @@ struct ModernActiveWorkoutView: View {
     }
 }
 
-struct ModernPokemonWorkoutHeader: View {
-    let pokemon: Pokemon
+struct ModernCompanionWorkoutHeader: View {
+    let companion: Companion
     let elapsedTime: String
     let isPaused: Bool
     @State private var isAnimating = false
     
     var body: some View {
         HStack(spacing: Theme.Spacing.medium) {
-            // Pokemon avatar (smaller for header)
+            // Companion avatar (smaller for header)
             ZStack {
                 Circle()
-                    .stroke(pokemon.type.color.opacity(0.3), lineWidth: 2)
+                    .stroke(companion.type.color.opacity(0.3), lineWidth: 2)
                     .frame(width: 60, height: 60)
                     .scaleEffect(isAnimating ? 1.05 : 1.0)
                 
-                Text(String(pokemon.name.prefix(1)))
+                Text(String(companion.name.prefix(1)))
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(pokemon.type.color)
+                    .foregroundColor(companion.type.color)
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
@@ -427,18 +431,18 @@ struct ModernPokemonWorkoutHeader: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(pokemon.nickname ?? pokemon.name)
+                Text(companion.nickname ?? companion.name)
                     .font(.headline)
                     .foregroundColor(.white)
                 
                 Text(isPaused ? "Taking a Break" : "Training Hard!")
                     .font(.caption)
-                    .foregroundColor(isPaused ? .orange : pokemon.type.color)
+                    .foregroundColor(isPaused ? .orange : companion.type.color)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
                     .background(
                         Capsule()
-                            .stroke((isPaused ? Color.orange : pokemon.type.color).opacity(0.3), lineWidth: 1)
+                            .stroke((isPaused ? Color.orange : companion.type.color).opacity(0.3), lineWidth: 1)
                     )
             }
             
@@ -631,7 +635,7 @@ struct WorkoutCompletionOverlay: View {
                             .foregroundColor(.white)
                             .opacity(animationPhase >= 3 ? 1 : 0)
                         
-                        Text("Your Pokemon gained \(workout.totalExperience) XP!")
+                        Text("Your Companion gained \(workout.totalExperience) XP!")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.8))
                             .opacity(animationPhase >= 4 ? 1 : 0)

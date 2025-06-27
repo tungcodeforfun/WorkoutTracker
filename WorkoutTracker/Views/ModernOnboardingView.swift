@@ -107,7 +107,7 @@ struct WelcomePage: View {
                 VStack(spacing: 16) {
                     // App title with modern typography
                     HStack(spacing: 8) {
-                        Text("PokeFit")
+                        Text("CompanionFit")
                             .font(.system(size: 42, weight: .bold, design: .rounded))
                             .foregroundColor(.white)
                         
@@ -118,7 +118,7 @@ struct WelcomePage: View {
                             .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: isAnimating)
                     }
                     
-                    Text("Turn every workout into\na Pokemon adventure")
+                    Text("Turn every workout into\na companion adventure")
                         .font(.system(size: 18, weight: .medium))
                         .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
@@ -172,7 +172,7 @@ struct WelcomePage: View {
     
     private let features = [
         (icon: "figure.strengthtraining.traditional", title: "Real Workouts", description: "Track actual exercises & progress", color: Color.blue),
-        (icon: "sparkles", title: "Pokemon Evolution", description: "Level up with every workout", color: Color.purple),
+        (icon: "sparkles", title: "Companion Growth", description: "Level up with every workout", color: Color.purple),
         (icon: "trophy.fill", title: "Achievements", description: "Unlock badges & rewards", color: Color.orange)
     ]
 }
@@ -239,7 +239,7 @@ struct UserInfoPage: View {
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                     
-                    Text("Choose your identity in the Pokemon world")
+                    Text("Choose your identity as a trainer")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.white.opacity(0.8))
                         .multilineTextAlignment(.center)
@@ -405,7 +405,7 @@ struct ReadyPage: View {
                         .offset(y: showContent ? 0 : 20)
                         .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.3), value: showContent)
                     
-                    Text("Your Pokemon journey begins now.\nReady to catch your first partner?")
+                    Text("Your companion journey begins now.\nReady to meet your first partner?")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
@@ -426,7 +426,7 @@ struct ReadyPage: View {
                     Image(systemName: "sparkles")
                         .font(.system(size: 18, weight: .semibold))
                     
-                    Text("Choose Your Starter Pokemon")
+                    Text("Choose Your Starter Companion")
                         .font(.system(size: 18, weight: .bold))
                     
                     Image(systemName: "arrow.right")

@@ -30,11 +30,11 @@ struct ModernTabView: View {
                 }
                 .tag(1)
             
-            PokemonListView(viewModel: viewModel)
+            CompanionListView(viewModel: viewModel)
                 .tabItem {
                     VStack {
                         Image(systemName: viewModel.selectedTab == 2 ? "sparkles" : "sparkles")
-                        Text("Pokemon")
+                        Text("Companions")
                     }
                 }
                 .tag(2)

@@ -65,6 +65,7 @@ extension View {
             .background(Theme.gradient)
             .cornerRadius(Theme.CornerRadius.medium)
             .shadow(color: Theme.Colors.accent.opacity(0.3), radius: 8, x: 0, y: 4)
+            .buttonStyle(PlainButtonStyle())
     }
     
     func secondaryButtonStyle() -> some View {
@@ -77,6 +78,7 @@ extension View {
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
                     .stroke(Theme.Colors.accent, lineWidth: 2)
             )
+            .buttonStyle(PlainButtonStyle())
     }
 }
 

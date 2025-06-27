@@ -59,9 +59,9 @@ struct ModernDashboardView: View {
                         .padding(.horizontal, 24)
                         .padding(.top, 20)
                         
-                        // Active Pokemon Card
-                        if let activePokemon = user.activePokemon {
-                            ModernPokemonCard(pokemon: activePokemon)
+                        // Active Companion Card
+                        if let activeCompanion = user.activeCompanion {
+                            ModernCompanionCard(companion: activeCompanion)
                                 .padding(.horizontal, 24)
                                 .opacity(showContent ? 1 : 0)
                                 .offset(x: showContent ? 0 : -50)
@@ -113,36 +113,36 @@ struct ModernDashboardView: View {
     }
 }
 
-struct ModernPokemonCard: View {
-    let pokemon: Pokemon
+struct ModernCompanionCard: View {
+    let companion: Companion
     @State private var isAnimating = false
     
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Active Pokemon")
+                    Text("Active Companion")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
                         .textCase(.uppercase)
                         .tracking(0.5)
                     
-                    Text(pokemon.nickname ?? pokemon.name)
+                    Text(companion.nickname ?? companion.name)
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                     
                     HStack(spacing: 12) {
-                        Text("Level \(pokemon.level)")
+                        Text("Level \(companion.level)")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(pokemon.type.color)
+                            .foregroundColor(companion.type.color)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(
                                 Capsule()
-                                    .stroke(pokemon.type.color.opacity(0.3), lineWidth: 1)
+                                    .stroke(companion.type.color.opacity(0.3), lineWidth: 1)
                             )
                         
-                        Text(pokemon.type.rawValue)
+                        Text(companion.type.rawValue)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -150,16 +150,16 @@ struct ModernPokemonCard: View {
                 
                 Spacer()
                 
-                // Pokemon Avatar
+                // Companion Avatar
                 ZStack {
                     Circle()
-                        .stroke(pokemon.type.color.opacity(0.4), lineWidth: 2)
+                        .stroke(companion.type.color.opacity(0.4), lineWidth: 2)
                         .frame(width: 80, height: 80)
                         .scaleEffect(isAnimating ? 1.05 : 1.0)
                     
-                    Text(String(pokemon.name.prefix(1)))
+                    Text(String(companion.name.prefix(1)))
                         .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(pokemon.type.color)
+                        .foregroundColor(companion.type.color)
                 }
             }
             .padding(24)
@@ -173,15 +173,15 @@ struct ModernPokemonCard: View {
                     
                     Spacer()
                     
-                    Text("\(pokemon.experience)/\(pokemon.experienceForNextLevel())")
+                    Text("\(companion.experience)/\(companion.experienceForNextLevel())")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
                 }
                 
                 ProgressBar(
-                    value: Double(pokemon.experience),
-                    maxValue: Double(pokemon.experienceForNextLevel()),
-                    color: pokemon.type.color
+                    value: Double(companion.experience),
+                    maxValue: Double(companion.experienceForNextLevel()),
+                    color: companion.type.color
                 )
                 .frame(height: 8)
             }
@@ -219,7 +219,7 @@ struct QuickActionsSection: View {
                     viewModel.selectedTab = 1
                 }
                 
-                QuickActionButton(icon: "sparkles", title: "View Pokemon", color: .purple) {
+                QuickActionButton(icon: "sparkles", title: "View Companions", color: .purple) {
                     viewModel.selectedTab = 2
                 }
             }
@@ -265,6 +265,7 @@ struct QuickActionButton: View {
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: isPressed)
         }
+        .buttonStyle(PlainButtonStyle())
         .onPressGesture(
             onPress: { isPressed = true },
             onRelease: { isPressed = false }
@@ -285,9 +286,9 @@ struct StatsOverview: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     StatCard(icon: "figure.run", title: "Workouts", value: "\(user.workouts.count)", color: .blue)
-                    StatCard(icon: "sparkles", title: "Pokemon", value: "\(user.pokemon.count)", color: .purple)
+                    StatCard(icon: "sparkles", title: "Companions", value: "\(user.companions.count)", color: .purple)
                     StatCard(icon: "trophy.fill", title: "Badges", value: "\(user.badges.count)", color: .orange)
-                    StatCard(icon: "flame.fill", title: "Total XP", value: "\(user.pokemon.reduce(0) { $0 + $1.experience })", color: .red)
+                    StatCard(icon: "flame.fill", title: "Total XP", value: "\(user.companions.reduce(0) { $0 + $1.experience })", color: .red)
                 }
                 .padding(.horizontal, 24)
             }

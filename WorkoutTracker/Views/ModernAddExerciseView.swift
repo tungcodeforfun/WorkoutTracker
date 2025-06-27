@@ -264,7 +264,7 @@ extension ModernAddExerciseView {
             }
             
             HStack {
-                Text("Your Pokemon will gain")
+                Text("Your companion will gain")
                     .foregroundColor(.white.opacity(0.8))
                 
                 Spacer()
@@ -351,6 +351,7 @@ struct ExerciseTypeChip: View {
                         )
                 )
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
