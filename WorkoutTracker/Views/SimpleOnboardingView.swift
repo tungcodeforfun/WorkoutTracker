@@ -17,7 +17,11 @@ struct SimpleOnboardingView: View {
         GeometryReader { geometry in
             ZStack {
                 LinearGradient(
-                    colors: [Theme.Colors.accent.opacity(0.1), Theme.Colors.background],
+                    colors: [
+                        Theme.Colors.gradientStart.opacity(0.08),
+                        Theme.Colors.gradientMiddle.opacity(0.05),
+                        Theme.Colors.background
+                    ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -31,13 +35,18 @@ struct SimpleOnboardingView: View {
                         VStack(spacing: Theme.Spacing.large) {
                             ZStack {
                                 Circle()
-                                    .fill(Theme.gradient.opacity(0.2))
+                                    .fill(Theme.gradient.opacity(0.15))
                                     .frame(width: 140, height: 140)
                                     .scaleEffect(animationAmount)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Theme.gradient, lineWidth: 2)
+                                            .opacity(0.3)
+                                    )
                                 
                                 Image(systemName: "figure.run.circle.fill")
                                     .font(.system(size: 70))
-                                    .foregroundColor(Theme.Colors.accent)
+                                    .foregroundStyle(Theme.gradient)
                             }
                             .onAppear {
                                 withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
@@ -50,12 +59,12 @@ struct SimpleOnboardingView: View {
                                     Text("Pokemon")
                                         .font(.largeTitle)
                                         .fontWeight(.bold)
-                                        .foregroundColor(Theme.Colors.primaryText)
+                                        .foregroundStyle(Theme.gradient)
                                     
                                     Text("Workout")
                                         .font(.largeTitle)
                                         .fontWeight(.bold)
-                                        .foregroundColor(Theme.Colors.accent)
+                                        .foregroundColor(Theme.Colors.primaryText)
                                 }
                                 
                                 Text("Transform your workouts into an epic Pokemon adventure")
@@ -68,9 +77,9 @@ struct SimpleOnboardingView: View {
                         
                         // Features
                         VStack(spacing: Theme.Spacing.medium) {
-                            FeatureRow(icon: "sparkles", text: "Catch & train Pokemon", color: .purple)
-                            FeatureRow(icon: "figure.run", text: "Track real workouts", color: .blue)
-                            FeatureRow(icon: "trophy.fill", text: "Earn badges & rewards", color: .orange)
+                            FeatureRow(icon: "sparkles", text: "Catch & train Pokemon", color: Theme.Colors.gradientStart)
+                            FeatureRow(icon: "figure.run", text: "Track real workouts", color: Theme.Colors.accent)
+                            FeatureRow(icon: "trophy.fill", text: "Earn badges & rewards", color: Theme.Colors.warning)
                         }
                         .padding(.horizontal)
                         
@@ -113,24 +122,13 @@ struct SimpleOnboardingView: View {
                         .disabled(username.isEmpty || trainerName.isEmpty)
                         .padding(.horizontal)
                         
-                        // Debug: Reset button
-                        Button("Reset User Data (Debug)") {
+                        // Debug: Reset button (subtle)
+                        Button("Reset Data") {
                             viewModel.resetUser()
                         }
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .padding(.top)
-                        
-                        // Debug: Color test
-                        VStack {
-                            Text("Debug: Text should be dark on light background")
-                                .font(.caption2)
-                                .foregroundColor(Theme.Colors.primaryText)
-                                .padding(8)
-                                .background(Color.white)
-                                .cornerRadius(8)
-                        }
-                        .padding(.top)
+                        .font(.caption2)
+                        .foregroundColor(Theme.Colors.tertiaryText)
+                        .padding(.top, 20)
                         
                         Spacer(minLength: 60)
                     }
@@ -179,8 +177,12 @@ struct ModernTextField: View {
         .padding(Theme.Spacing.medium)
         .background(
             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                .fill(Color.white)
-                .shadow(color: Theme.cardShadow, radius: 4, x: 0, y: 2)
+                .fill(Theme.Colors.surface)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
+                        .stroke(Theme.Colors.separator, lineWidth: 1)
+                )
+                .shadow(color: Theme.Colors.shadow, radius: 8, x: 0, y: 3)
         )
     }
 }

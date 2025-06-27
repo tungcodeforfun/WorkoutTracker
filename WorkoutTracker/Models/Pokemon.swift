@@ -20,14 +20,14 @@ enum PokemonType: String, CaseIterable, Codable {
     
     var color: Color {
         switch self {
-        case .fire: return Color(red: 0.95, green: 0.4, blue: 0.3)
-        case .water: return Color(red: 0.3, green: 0.6, blue: 0.95)
-        case .grass: return Color(red: 0.4, green: 0.8, blue: 0.4)
-        case .electric: return Color(red: 0.95, green: 0.8, blue: 0.2)
-        case .fighting: return Color(red: 0.8, green: 0.4, blue: 0.2)
-        case .psychic: return Color(red: 0.8, green: 0.4, blue: 0.8)
-        case .rock: return Color(red: 0.6, green: 0.5, blue: 0.4)
-        case .flying: return Color(red: 0.4, green: 0.7, blue: 0.9)
+        case .fire: return Color(red: 1.00, green: 0.31, blue: 0.26)      // Modern red
+        case .water: return Color(red: 0.20, green: 0.60, blue: 1.00)     // Modern blue
+        case .grass: return Color(red: 0.30, green: 0.85, blue: 0.45)     // Modern green
+        case .electric: return Color(red: 1.00, green: 0.80, blue: 0.00)  // Modern yellow
+        case .fighting: return Color(red: 1.00, green: 0.45, blue: 0.20)  // Modern orange
+        case .psychic: return Color(red: 0.85, green: 0.40, blue: 0.95)   // Modern purple
+        case .rock: return Color(red: 0.55, green: 0.45, blue: 0.35)      // Modern brown
+        case .flying: return Color(red: 0.40, green: 0.75, blue: 1.00)    // Modern sky blue
         }
     }
 }
