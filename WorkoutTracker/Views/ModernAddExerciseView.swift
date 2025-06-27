@@ -63,6 +63,7 @@ extension ModernAddExerciseView {
             }
             .font(.system(size: 16, weight: .medium))
             .foregroundColor(.white.opacity(0.8))
+            .buttonStyle(PlainButtonStyle())
             
             Spacer()
             
@@ -78,6 +79,7 @@ extension ModernAddExerciseView {
             .font(.system(size: 16, weight: .semibold))
             .foregroundColor(isValid ? .blue : .white.opacity(0.5))
             .disabled(!isValid)
+            .buttonStyle(PlainButtonStyle())
         }
         .padding(.horizontal, 24)
         .padding(.top, 20)
@@ -142,6 +144,7 @@ extension ModernAddExerciseView {
                     .stroke(Color.white.opacity(0.2), lineWidth: 1)
             )
         }
+        .buttonStyle(PlainButtonStyle())
     }
     
     private var customExerciseField: some View {

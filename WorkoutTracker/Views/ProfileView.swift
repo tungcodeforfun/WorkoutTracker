@@ -86,6 +86,7 @@ struct ProfileView: View {
                                         )
                                 )
                             }
+                            .buttonStyle(PlainButtonStyle())
                             .padding(.horizontal, 24)
                             .padding(.top, 20)
                             .opacity(showContent ? 1 : 0)

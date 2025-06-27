@@ -14,11 +14,14 @@ struct ContentView: View {
         if viewModel.currentUser != nil {
             if viewModel.showingCompanionSelection {
                 ModernCompanionSelectionView(viewModel: viewModel)
+                    .buttonStyle(PlainButtonStyle())
             } else {
                 ModernTabView(viewModel: viewModel)
+                    .buttonStyle(PlainButtonStyle())
             }
         } else {
             ModernOnboardingView(viewModel: viewModel)
+                .buttonStyle(PlainButtonStyle())
         }
     }
 }
