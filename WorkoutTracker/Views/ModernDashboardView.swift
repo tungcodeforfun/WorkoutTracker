@@ -10,75 +10,106 @@ import SwiftUI
 struct ModernDashboardView: View {
     @ObservedObject var viewModel: AppViewModel
     @State private var greeting = "Good Morning"
+    @State private var showContent = false
     
     var body: some View {
         ZStack {
-            Theme.Colors.background.ignoresSafeArea()
+            // Dark gradient background like onboarding
+            LinearGradient(
+                colors: [Color(red: 0.1, green: 0.1, blue: 0.2), Color(red: 0.2, green: 0.3, blue: 0.5)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
             
             ScrollView {
-                VStack(spacing: Theme.Spacing.large) {
+                VStack(spacing: 32) {
                     if let user = viewModel.currentUser {
-                        HeaderSection(user: user, greeting: greeting)
-                            .padding(.horizontal)
+                        // Header Section
+                        VStack(spacing: 24) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(greeting)
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(.white.opacity(0.8))
+                                    
+                                    Text(user.trainerName)
+                                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                }
+                                
+                                Spacer()
+                                
+                                // Profile avatar
+                                ZStack {
+                                    Circle()
+                                        .fill(LinearGradient(colors: [Color.blue, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                        .frame(width: 60, height: 60)
+                                    
+                                    Text(String(user.trainerName.prefix(1)))
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
+                                .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
+                            }
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : -20)
+                            .animation(.spring(response: 0.8, dampingFraction: 0.8), value: showContent)
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 20)
                         
+                        // Active Pokemon Card
                         if let activePokemon = user.activePokemon {
                             ModernPokemonCard(pokemon: activePokemon)
-                                .padding(.horizontal)
+                                .padding(.horizontal, 24)
+                                .opacity(showContent ? 1 : 0)
+                                .offset(x: showContent ? 0 : -50)
+                                .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.2), value: showContent)
                         }
                         
+                        // Quick Actions
                         QuickActionsSection(viewModel: viewModel)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 24)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(x: showContent ? 0 : 50)
+                            .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.4), value: showContent)
                         
+                        // Stats Overview
                         StatsOverview(user: user)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 30)
+                            .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.6), value: showContent)
                         
+                        // Recent Activity
                         RecentActivitySection(user: user)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 24)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 30)
+                            .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.8), value: showContent)
                     }
                 }
-                .padding(.vertical)
+                .padding(.vertical, 20)
             }
         }
-        .onAppear { updateGreeting() }
+        .onAppear {
+            updateGreeting()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showContent = true
+            }
+        }
     }
     
     private func updateGreeting() {
         let hour = Calendar.current.component(.hour, from: Date())
-        greeting = hour < 12 ? "Good Morning" :
-                   hour < 18 ? "Good Afternoon" : "Good Evening"
-    }
-}
-
-struct HeaderSection: View {
-    let user: User
-    let greeting: String
-    
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: Theme.Spacing.xxSmall) {
-                Text(greeting)
-                    .font(.title2)
-                    .foregroundColor(Theme.Colors.secondaryText)
-                
-                Text(user.trainerName)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(Theme.Colors.primaryText)
-            }
-            
-            Spacer()
-            
-            ZStack {
-                Circle()
-                    .fill(Theme.gradient)
-                    .frame(width: 56, height: 56)
-                
-                Text(String(user.trainerName.prefix(1)))
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-            }
+        switch hour {
+        case 5..<12:
+            greeting = "Good Morning"
+        case 12..<17:
+            greeting = "Good Afternoon"
+        default:
+            greeting = "Good Evening"
         }
-        .padding(.top)
     }
 }
 
@@ -89,109 +120,92 @@ struct ModernPokemonCard: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                VStack(alignment: .leading, spacing: 12) {
                     Text("Active Pokemon")
-                        .font(.caption)
-                        .foregroundColor(Theme.Colors.secondaryText)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
                         .textCase(.uppercase)
+                        .tracking(0.5)
                     
                     Text(pokemon.nickname ?? pokemon.name)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(Theme.Colors.primaryText)
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
                     
-                    HStack(spacing: Theme.Spacing.xSmall) {
-                        PillTag(text: "Lv.\(pokemon.level)", color: pokemon.type.color)
-                        PillTag(text: pokemon.type.rawValue, color: pokemon.type.color.opacity(0.2), textColor: pokemon.type.color)
+                    HStack(spacing: 12) {
+                        Text("Level \(pokemon.level)")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(pokemon.type.color)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(pokemon.type.color.opacity(0.2))
+                            )
+                        
+                        Text(pokemon.type.rawValue)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.white.opacity(0.8))
                     }
                 }
                 
                 Spacer()
                 
+                // Pokemon Avatar
                 ZStack {
                     Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [pokemon.type.color.opacity(0.3), pokemon.type.color.opacity(0.1)],
-                                center: .center,
-                                startRadius: 20,
-                                endRadius: 60
-                            )
-                        )
-                        .frame(width: 120, height: 120)
-                        .scaleEffect(isAnimating ? 1.05 : 1.0)
+                        .fill(pokemon.type.color.opacity(0.3))
+                        .frame(width: 80, height: 80)
+                        .scaleEffect(isAnimating ? 1.1 : 1.0)
+                        .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: isAnimating)
                     
                     Text(String(pokemon.name.prefix(1)))
-                        .font(.system(size: 60, weight: .bold, design: .rounded))
+                        .font(.system(size: 32, weight: .bold))
                         .foregroundColor(pokemon.type.color)
                 }
             }
-            .padding(Theme.Spacing.large)
+            .padding(24)
             
-            VStack(spacing: Theme.Spacing.small) {
+            // XP Progress Bar
+            VStack(spacing: 8) {
                 HStack {
-                    Text("Experience")
-                        .font(.caption)
-                        .foregroundColor(Theme.Colors.secondaryText)
+                    Text("XP Progress")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
                     
                     Spacer()
                     
-                    Text("\(pokemon.experience)/\(pokemon.experienceForNextLevel()) XP")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(Theme.Colors.primaryText)
+                    Text("\(pokemon.experience)/\(pokemon.experienceForNextLevel())")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
                 }
                 
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                            .fill(Theme.Colors.background)
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.white.opacity(0.2))
                             .frame(height: 8)
                         
-                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                            .fill(
-                                LinearGradient(
-                                    colors: [pokemon.type.color, pokemon.type.color.opacity(0.7)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(
-                                width: geometry.size.width * CGFloat(pokemon.experience) / CGFloat(pokemon.experienceForNextLevel()),
-                                height: 8
-                            )
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(LinearGradient(colors: [pokemon.type.color, pokemon.type.color.opacity(0.7)], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: geometry.size.width * (Double(pokemon.experience) / Double(pokemon.experienceForNextLevel())), height: 8)
+                            .animation(.spring(response: 1.0, dampingFraction: 0.8), value: pokemon.experience)
                     }
                 }
                 .frame(height: 8)
             }
-            .padding(Theme.Spacing.large)
-            .background(Theme.Colors.background.opacity(0.5))
+            .padding(.horizontal, 24)
+            .padding(.bottom, 24)
         }
-        .modernCard()
-        .onAppear {
-            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-                isAnimating = true
-            }
-        }
-    }
-}
-
-struct PillTag: View {
-    let text: String
-    let color: Color
-    var textColor: Color = .white
-    
-    var body: some View {
-        Text(text)
-            .font(.caption)
-            .fontWeight(.semibold)
-            .foregroundColor(textColor)
-            .padding(.horizontal, Theme.Spacing.small)
-            .padding(.vertical, Theme.Spacing.xxSmall)
-            .background(
-                Capsule()
-                    .fill(color)
-            )
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
+        )
+        .shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 8)
+        .onAppear { isAnimating = true }
     }
 }
 
@@ -199,21 +213,19 @@ struct QuickActionsSection: View {
     @ObservedObject var viewModel: AppViewModel
     
     var body: some View {
-        HStack(spacing: Theme.Spacing.medium) {
-            QuickActionButton(
-                icon: "figure.run",
-                title: "Start Workout",
-                color: Theme.Colors.accent
-            ) {
-                viewModel.selectedTab = 1
-            }
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Quick Actions")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.white)
             
-            QuickActionButton(
-                icon: "trophy.fill",
-                title: "View Progress",
-                color: Theme.Colors.warning
-            ) {
-                viewModel.selectedTab = 3
+            HStack(spacing: 16) {
+                QuickActionButton(icon: "figure.run", title: "Start Workout", color: .blue) {
+                    viewModel.selectedTab = 1
+                }
+                
+                QuickActionButton(icon: "sparkles", title: "View Pokemon", color: .purple) {
+                    viewModel.selectedTab = 2
+                }
             }
         }
     }
@@ -224,32 +236,43 @@ struct QuickActionButton: View {
     let title: String
     let color: Color
     let action: () -> Void
+    @State private var isPressed = false
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: Theme.Spacing.small) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .frame(width: 48, height: 48)
-                    .background(
-                        Circle()
-                            .fill(color)
-                    )
+            VStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.2))
+                        .frame(width: 48, height: 48)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(color)
+                }
                 
                 Text(title)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(Theme.Colors.primaryText)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, Theme.Spacing.medium)
+            .frame(height: 100)
             .background(
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                    .fill(Theme.Colors.surface)
-                    .shadow(color: Theme.cardShadow, radius: 6, x: 0, y: 2)
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(0.1))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
             )
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
         }
+        .onPressGesture(
+            onPress: { isPressed = true },
+            onRelease: { isPressed = false }
+        )
     }
 }
 
@@ -257,68 +280,61 @@ struct StatsOverview: View {
     let user: User
     
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: Theme.Spacing.medium) {
-                StatCard(
-                    value: "\(user.workouts.count)",
-                    label: "Workouts",
-                    icon: "flame.fill",
-                    color: .orange
-                )
-                
-                StatCard(
-                    value: "\(user.totalExperience)",
-                    label: "Total XP",
-                    icon: "star.fill",
-                    color: .yellow
-                )
-                
-                StatCard(
-                    value: "\(user.pokemon.count)",
-                    label: "Pokemon",
-                    icon: "sparkles",
-                    color: .purple
-                )
-                
-                StatCard(
-                    value: "\(user.badges.count)",
-                    label: "Badges",
-                    icon: "medal.fill",
-                    color: .blue
-                )
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Your Progress")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 24)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    StatCard(icon: "figure.run", title: "Workouts", value: "\(user.workouts.count)", color: .blue)
+                    StatCard(icon: "sparkles", title: "Pokemon", value: "\(user.pokemon.count)", color: .purple)
+                    StatCard(icon: "trophy.fill", title: "Badges", value: "\(user.badges.count)", color: .orange)
+                    StatCard(icon: "flame.fill", title: "Total XP", value: "\(user.pokemon.reduce(0) { $0 + $1.experience })", color: .red)
+                }
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal)
         }
     }
 }
 
 struct StatCard: View {
-    let value: String
-    let label: String
     let icon: String
+    let title: String
+    let value: String
     let color: Color
     
     var body: some View {
-        VStack(spacing: Theme.Spacing.small) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundColor(color)
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.2))
+                    .frame(width: 40, height: 40)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(color)
+            }
             
-            Text(value)
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(Theme.Colors.primaryText)
-            
-            Text(label)
-                .font(.caption)
-                .foregroundColor(Theme.Colors.secondaryText)
+            VStack(spacing: 4) {
+                Text(value)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
+                
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+            }
         }
-        .frame(width: 100)
-        .padding(.vertical, Theme.Spacing.large)
+        .frame(width: 100, height: 100)
         .background(
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                .fill(Theme.Colors.surface)
-                .shadow(color: Theme.cardShadow, radius: 6, x: 0, y: 2)
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
         )
     }
 }
@@ -327,20 +343,16 @@ struct RecentActivitySection: View {
     let user: User
     
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Recent Activity")
-                .font(.headline)
-                .foregroundColor(Theme.Colors.primaryText)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.white)
             
             if user.workouts.isEmpty {
-                EmptyStateCard(
-                    icon: "figure.run",
-                    message: "No workouts yet",
-                    submessage: "Start your first workout to see progress here!"
-                )
+                EmptyStateCard()
             } else {
-                VStack(spacing: Theme.Spacing.small) {
-                    ForEach(user.workouts.suffix(3)) { workout in
+                LazyVStack(spacing: 12) {
+                    ForEach(user.workouts.prefix(3)) { workout in
                         ModernWorkoutRow(workout: workout)
                     }
                 }
@@ -353,75 +365,88 @@ struct ModernWorkoutRow: View {
     let workout: Workout
     
     var body: some View {
-        HStack {
-            Circle()
-                .fill(Theme.Colors.accent.opacity(0.2))
-                .frame(width: 44, height: 44)
-                .overlay(
-                    Image(systemName: "figure.run")
-                        .foregroundColor(Theme.Colors.accent)
-                )
-            
-            VStack(alignment: .leading, spacing: Theme.Spacing.xxSmall) {
-                Text(workout.date, style: .date)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(Theme.Colors.primaryText)
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(Color.green.opacity(0.2))
+                    .frame(width: 40, height: 40)
                 
-                Text("\(workout.exercises.count) exercises • \(formatDuration(workout.totalDuration))")
-                    .font(.caption)
-                    .foregroundColor(Theme.Colors.secondaryText)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.green)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(workout.exercises.count) exercises")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+                
+                Text(workout.date, style: .date)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
             }
             
             Spacer()
             
-            Text("+\(workout.totalExperience)")
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .foregroundColor(Theme.Colors.success)
-            
-            Text("XP")
-                .font(.caption)
-                .foregroundColor(Theme.Colors.success)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text("+\(workout.totalExperience) XP")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.green)
+                
+                Text("\(Int(workout.totalDuration/60)) min")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+            }
         }
-        .padding(Theme.Spacing.medium)
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                .fill(Theme.Colors.background)
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
         )
-    }
-    
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let minutes = Int(duration) / 60
-        return "\(minutes)m"
     }
 }
 
 struct EmptyStateCard: View {
-    let icon: String
-    let message: String
-    let submessage: String
-    
     var body: some View {
-        VStack(spacing: Theme.Spacing.small) {
-            Image(systemName: icon)
-                .font(.largeTitle)
-                .foregroundColor(Theme.Colors.secondaryText)
+        VStack(spacing: 16) {
+            Image(systemName: "figure.run.circle")
+                .font(.system(size: 40))
+                .foregroundColor(.white.opacity(0.6))
             
-            Text(message)
-                .font(.headline)
-                .foregroundColor(Theme.Colors.primaryText)
-            
-            Text(submessage)
-                .font(.caption)
-                .foregroundColor(Theme.Colors.secondaryText)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 8) {
+                Text("No workouts yet")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+                
+                Text("Start your first workout to see your activity here")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, Theme.Spacing.xLarge)
+        .padding(32)
         .background(
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                .fill(Theme.Colors.background)
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
+        )
+    }
+}
+
+extension View {
+    func onPressGesture(onPress: @escaping () -> Void, onRelease: @escaping () -> Void) -> some View {
+        self.simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in onPress() }
+                .onEnded { _ in onRelease() }
         )
     }
 }

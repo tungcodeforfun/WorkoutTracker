@@ -10,39 +10,71 @@ import SwiftUI
 struct PokemonListView: View {
     @ObservedObject var viewModel: AppViewModel
     @State private var selectedPokemon: Pokemon?
+    @State private var showContent = false
     
     var body: some View {
         ZStack {
-            Theme.Colors.background.ignoresSafeArea()
+            // Dark gradient background like onboarding
+            LinearGradient(
+                colors: [Color(red: 0.15, green: 0.2, blue: 0.35), Color(red: 0.3, green: 0.4, blue: 0.6)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Custom header
                 HStack {
                     Text("My Pokemon")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(Theme.Colors.primaryText)
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
                     
                     Spacer()
+                    
+                    if let user = viewModel.currentUser {
+                        Text("\(user.pokemon.count)")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white.opacity(0.2))
+                            )
+                    }
                 }
-                .padding(.horizontal)
-                .padding(.top, Theme.Spacing.medium)
-                .padding(.bottom, Theme.Spacing.small)
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .padding(.bottom, 16)
+                .opacity(showContent ? 1 : 0)
+                .offset(y: showContent ? 0 : -20)
+                .animation(.spring(response: 0.8, dampingFraction: 0.8), value: showContent)
                 
                 ScrollView {
                     if let user = viewModel.currentUser {
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                            ForEach(user.pokemon) { pokemon in
-                                PokemonDetailCard(
-                                    pokemon: pokemon,
-                                    isActive: pokemon.id == user.activePokemonId
-                                )
-                                .onTapGesture {
-                                    selectedPokemon = pokemon
+                        if user.pokemon.isEmpty {
+                            EmptyPokemonState()
+                                .padding(.top, 60)
+                                .opacity(showContent ? 1 : 0)
+                                .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.3), value: showContent)
+                        } else {
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                ForEach(Array(user.pokemon.enumerated()), id: \.element.id) { index, pokemon in
+                                    PokemonDetailCard(
+                                        pokemon: pokemon,
+                                        isActive: pokemon.id == user.activePokemonId
+                                    )
+                                    .onTapGesture {
+                                        selectedPokemon = pokemon
+                                    }
+                                    .opacity(showContent ? 1 : 0)
+                                    .offset(y: showContent ? 0 : 30)
+                                    .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(Double(index) * 0.1), value: showContent)
                                 }
                             }
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, 24)
                         }
-                        .padding()
                     }
                 }
             }
@@ -50,69 +82,157 @@ struct PokemonListView: View {
         .sheet(item: $selectedPokemon) { pokemon in
             PokemonManagementSheet(pokemon: pokemon, viewModel: viewModel)
         }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                showContent = true
+            }
+        }
     }
 }
 
 struct PokemonDetailCard: View {
     let pokemon: Pokemon
     let isActive: Bool
+    @State private var isAnimating = false
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
+            // Active badge
             if isActive {
-                Text("ACTIVE")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .fill(Color.green)
-                    )
+                HStack {
+                    Text("ACTIVE")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(LinearGradient(colors: [Color.green, Color.blue], startPoint: .leading, endPoint: .trailing))
+                        )
+                    
+                    Spacer()
+                }
+            } else {
+                Spacer()
+                    .frame(height: 18)
             }
             
+            // Pokemon avatar
             ZStack {
                 Circle()
                     .fill(pokemon.type.color.opacity(0.3))
                     .frame(width: 80, height: 80)
+                    .scaleEffect(isAnimating ? 1.1 : 1.0)
+                    .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: isAnimating)
                 
-                Text(String(pokemon.name.prefix(2)).uppercased())
-                    .font(.system(size: 36, weight: .bold))
+                Text(String(pokemon.name.prefix(1)))
+                    .font(.system(size: 32, weight: .bold))
                     .foregroundColor(pokemon.type.color)
             }
             
-            Text(pokemon.nickname ?? pokemon.name)
-                .font(.headline)
-                .lineLimit(1)
-            
-            HStack(spacing: 4) {
-                Text("Lv.\(pokemon.level)")
-                    .font(.caption)
-                    .fontWeight(.semibold)
+            VStack(spacing: 8) {
+                Text(pokemon.nickname ?? pokemon.name)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
                 
-                Text("•")
-                    .foregroundColor(.secondary)
-                
-                Text(pokemon.type.rawValue)
-                    .font(.caption)
-                    .foregroundColor(pokemon.type.color)
+                HStack(spacing: 8) {
+                    Text("Level \(pokemon.level)")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(pokemon.type.color)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(pokemon.type.color.opacity(0.2))
+                        )
+                    
+                    Text(pokemon.type.rawValue)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.white.opacity(0.2))
+                        )
+                }
             }
             
-            ProgressView(value: Double(pokemon.experience),
-                        total: Double(pokemon.experienceForNextLevel()))
-                .tint(pokemon.type.color)
+            // XP Progress
+            VStack(spacing: 6) {
+                HStack {
+                    Text("XP")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
+                    
+                    Spacer()
+                    
+                    Text("\(pokemon.experience)/\(pokemon.experienceForNextLevel())")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+                
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.white.opacity(0.2))
+                            .frame(height: 6)
+                        
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(pokemon.type.color)
+                            .frame(
+                                width: geometry.size.width * (Double(pokemon.experience) / Double(pokemon.experienceForNextLevel())),
+                                height: 6
+                            )
+                            .animation(.spring(response: 1.0, dampingFraction: 0.8), value: pokemon.experience)
+                    }
+                }
+                .frame(height: 6)
+            }
         }
-        .padding()
-        .frame(maxWidth: .infinity)
+        .padding(16)
+        .frame(height: 240)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.gray.opacity(0.1))
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.1))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(isActive ? Color.green : Color.clear, lineWidth: 2)
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(isActive ? LinearGradient(colors: [Color.green, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [Color.white.opacity(0.3), Color.white.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: isActive ? 2 : 1)
                 )
         )
+        .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 5)
+        .onAppear { isAnimating = true }
+    }
+}
+
+struct EmptyPokemonState: View {
+    var body: some View {
+        VStack(spacing: 24) {
+            ZStack {
+                Circle()
+                    .fill(Color.white.opacity(0.1))
+                    .frame(width: 120, height: 120)
+                
+                Image(systemName: "sparkles")
+                    .font(.system(size: 50))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            
+            VStack(spacing: 12) {
+                Text("No Pokemon Yet")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                
+                Text("Complete your first workout to\ncatch your starter Pokemon!")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(32)
     }
 }
 
@@ -120,138 +240,171 @@ struct PokemonManagementSheet: View {
     let pokemon: Pokemon
     @ObservedObject var viewModel: AppViewModel
     @Environment(\.dismiss) var dismiss
-    @State private var newNickname = ""
-    @State private var showingNicknameField = false
+    @State private var nickname = ""
+    @State private var showContent = false
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
+        ZStack {
+            // Dark gradient background
+            LinearGradient(
+                colors: [Color(red: 0.15, green: 0.2, blue: 0.35), Color(red: 0.3, green: 0.4, blue: 0.6)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 32) {
+                // Header
+                HStack {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.white.opacity(0.8))
+                    
+                    Spacer()
+                    
+                    Text("Pokemon Details")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    Button("Save") {
+                        if !nickname.isEmpty {
+                            viewModel.updatePokemonNickname(pokemon.id, nickname: nickname)
+                        }
+                        dismiss()
+                    }
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.blue)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .opacity(showContent ? 1 : 0)
+                .animation(.spring(response: 0.8, dampingFraction: 0.8), value: showContent)
+                
+                // Pokemon Display
+                VStack(spacing: 24) {
                     ZStack {
                         Circle()
                             .fill(pokemon.type.color.opacity(0.3))
-                            .frame(width: 150, height: 150)
+                            .frame(width: 120, height: 120)
                         
-                        Text(String(pokemon.name.prefix(2)).uppercased())
-                            .font(.system(size: 72, weight: .bold))
+                        Text(String(pokemon.name.prefix(1)))
+                            .font(.system(size: 48, weight: .bold))
                             .foregroundColor(pokemon.type.color)
                     }
-                    
-                    VStack(spacing: 8) {
-                        Text(pokemon.nickname ?? pokemon.name)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        
-                        if pokemon.nickname == nil && !showingNicknameField {
-                            Button("Give Nickname") {
-                                showingNicknameField = true
-                                newNickname = ""
-                            }
-                            .font(.caption)
-                        }
-                        
-                        if showingNicknameField {
-                            HStack {
-                                TextField("Nickname", text: $newNickname)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                
-                                Button("Save") {
-                                    saveNickname()
-                                }
-                                .disabled(newNickname.isEmpty)
-                            }
-                            .padding(.horizontal)
-                        }
-                        
-                        Text("Level \(pokemon.level)")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                    }
+                    .opacity(showContent ? 1 : 0)
+                    .scaleEffect(showContent ? 1 : 0.5)
+                    .animation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2), value: showContent)
                     
                     VStack(spacing: 16) {
-                        StatRow(title: "Type", value: pokemon.type.rawValue, color: pokemon.type.color)
-                        StatRow(title: "HP", value: "\(pokemon.currentStats.hp)", color: .red)
-                        StatRow(title: "Attack", value: "\(pokemon.currentStats.attack)", color: .orange)
-                        StatRow(title: "Defense", value: "\(pokemon.currentStats.defense)", color: .blue)
-                        StatRow(title: "Speed", value: "\(pokemon.currentStats.speed)", color: .green)
-                    }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.gray.opacity(0.1))
-                    )
-                    
-                    VStack(spacing: 8) {
-                        Text("Experience")
-                            .font(.headline)
+                        Text(pokemon.nickname ?? pokemon.name)
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
                         
-                        ProgressView(value: Double(pokemon.experience),
-                                   total: Double(pokemon.experienceForNextLevel()))
-                            .tint(pokemon.type.color)
-                            .scaleEffect(y: 2)
-                        
-                        Text("\(pokemon.experience) / \(pokemon.experienceForNextLevel()) XP")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding()
-                    
-                    if pokemon.id != viewModel.currentUser?.activePokemonId {
-                        Button(action: makeActive) {
-                            Text("Make Active")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(pokemon.type.color)
-                                )
+                        HStack(spacing: 16) {
+                            StatRow(label: "Level", value: "\(pokemon.level)", color: pokemon.type.color)
+                            StatRow(label: "Type", value: pokemon.type.rawValue, color: pokemon.type.color)
                         }
-                        .padding(.horizontal)
+                        
+                        StatRow(label: "Experience", value: "\(pokemon.experience)/\(pokemon.experienceForNextLevel())", color: pokemon.type.color)
+                    }
+                    .opacity(showContent ? 1 : 0)
+                    .offset(y: showContent ? 0 : 20)
+                    .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.4), value: showContent)
+                }
+                
+                // Nickname Input
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Nickname")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                    
+                    TextField(pokemon.name, text: $nickname)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white)
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.1))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                )
+                        )
+                }
+                .padding(.horizontal, 24)
+                .opacity(showContent ? 1 : 0)
+                .offset(y: showContent ? 0 : 20)
+                .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.6), value: showContent)
+                
+                // Action Buttons
+                VStack(spacing: 16) {
+                    if viewModel.currentUser?.activePokemonId != pokemon.id {
+                        Button(action: {
+                            viewModel.setActivePokemon(pokemon.id)
+                            dismiss()
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "star.fill")
+                                Text("Set as Active")
+                            }
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(LinearGradient(colors: [Color.blue, Color.purple], startPoint: .leading, endPoint: .trailing))
+                            )
+                        }
                     }
                 }
-                .padding()
-            }
-            .navigationTitle("Pokemon Details")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Done") { dismiss() }
-                }
+                .padding(.horizontal, 24)
+                .opacity(showContent ? 1 : 0)
+                .offset(y: showContent ? 0 : 20)
+                .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.8), value: showContent)
+                
+                Spacer()
             }
         }
-    }
-    
-    private func saveNickname() {
-        guard let index = viewModel.currentUser?.pokemon.firstIndex(where: { $0.id == pokemon.id }) else { return }
-        viewModel.currentUser?.pokemon[index].nickname = newNickname
-        showingNicknameField = false
-        viewModel.saveUser()
-    }
-    
-    private func makeActive() {
-        viewModel.currentUser?.activePokemonId = pokemon.id
-        viewModel.saveUser()
-        dismiss()
+        .onAppear {
+            nickname = pokemon.nickname ?? ""
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                showContent = true
+            }
+        }
     }
 }
 
 struct StatRow: View {
-    let title: String
+    let label: String
     let value: String
     let color: Color
     
     var body: some View {
-        HStack {
-            Label(title, systemImage: "circle.fill")
-                .foregroundColor(color)
-                .font(.subheadline)
-            
-            Spacer()
+        VStack(spacing: 8) {
+            Text(label)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.white.opacity(0.7))
+                .textCase(.uppercase)
             
             Text(value)
-                .fontWeight(.semibold)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(.white)
         }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(color.opacity(0.3), lineWidth: 1)
+                )
+        )
     }
 }
 

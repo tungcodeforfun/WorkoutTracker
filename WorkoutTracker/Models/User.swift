@@ -45,6 +45,16 @@ struct User: Identifiable, Codable {
         }
     }
     
+    mutating func setActivePokemon(_ pokemonId: UUID) {
+        activePokemonId = pokemonId
+    }
+    
+    mutating func updatePokemonNickname(_ pokemonId: UUID, nickname: String) {
+        if let index = pokemon.firstIndex(where: { $0.id == pokemonId }) {
+            pokemon[index].nickname = nickname
+        }
+    }
+    
     mutating func completeWorkout(_ workout: Workout) {
         var updatedWorkout = workout
         updatedWorkout.pokemonUsed = activePokemonId

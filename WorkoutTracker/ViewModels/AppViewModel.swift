@@ -37,6 +37,16 @@ class AppViewModel: ObservableObject {
         saveUser()
     }
     
+    func setActivePokemon(_ pokemonId: UUID) {
+        currentUser?.setActivePokemon(pokemonId)
+        saveUser()
+    }
+    
+    func updatePokemonNickname(_ pokemonId: UUID, nickname: String) {
+        currentUser?.updatePokemonNickname(pokemonId, nickname: nickname)
+        saveUser()
+    }
+    
     
     private func loadUser() {
         guard let userData = UserDefaults.standard.data(forKey: "currentUser") else {

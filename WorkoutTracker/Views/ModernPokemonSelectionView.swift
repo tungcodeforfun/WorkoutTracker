@@ -109,11 +109,15 @@ struct ModernPokemonSelectionCard: View {
                         .font(.headline)
                         .foregroundColor(Theme.Colors.primaryText)
                     
-                    PillTag(
-                        text: pokemon.type.rawValue,
-                        color: pokemon.type.color,
-                        textColor: .white
-                    )
+                    Text(pokemon.type.rawValue)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(pokemon.type.color)
+                        )
                 }
                 .padding(.vertical, Theme.Spacing.large)
             }
@@ -175,13 +179,25 @@ struct PokemonDetailSheet: View {
             
             VStack(spacing: Theme.Spacing.large) {
                 HStack(spacing: Theme.Spacing.small) {
-                    PillTag(text: pokemon.type.rawValue, color: pokemon.type.color)
-                    if let evolutionLevel = pokemon.evolutionLevel {
-                        PillTag(
-                            text: "Evolves at Lv.\(evolutionLevel)",
-                            color: Theme.Colors.accent.opacity(0.2),
-                            textColor: Theme.Colors.accent
+                    Text(pokemon.type.rawValue)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(pokemon.type.color)
                         )
+                    if let evolutionLevel = pokemon.evolutionLevel {
+                        Text("Evolves at Lv.\(evolutionLevel)")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(Theme.Colors.accent)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Theme.Colors.accent.opacity(0.2))
+                            )
                     }
                 }
                 
