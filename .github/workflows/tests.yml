@@ -40,12 +40,14 @@ jobs:
         
         # First try with the specific iPhone 16 device - Unit tests only
         if xcodebuild \
+          -project WorkoutTracker.xcodeproj \
           -scheme WorkoutTracker \
           -destination "platform=iOS Simulator,id=$DEVICE_ID" \
           -configuration Debug \
-          clean build \
+          build-for-testing \
           CODE_SIGNING_ALLOWED=NO && \
         xcodebuild \
+          -project WorkoutTracker.xcodeproj \
           -scheme WorkoutTracker \
           -destination "platform=iOS Simulator,id=$DEVICE_ID" \
           -configuration Debug \
@@ -61,12 +63,14 @@ jobs:
           xcrun simctl boot "$IPAD_ID" || echo "Failed to boot iPad simulator"
           
           xcodebuild \
+            -project WorkoutTracker.xcodeproj \
             -scheme WorkoutTracker \
             -destination "platform=iOS Simulator,id=$IPAD_ID" \
             -configuration Debug \
-            clean build \
+            build-for-testing \
             CODE_SIGNING_ALLOWED=NO && \
           xcodebuild \
+            -project WorkoutTracker.xcodeproj \
             -scheme WorkoutTracker \
             -destination "platform=iOS Simulator,id=$IPAD_ID" \
             -configuration Debug \
