@@ -121,6 +121,17 @@ struct SimpleOnboardingView: View {
                         .foregroundColor(.red)
                         .padding(.top)
                         
+                        // Debug: Color test
+                        VStack {
+                            Text("Debug: Text should be dark on light background")
+                                .font(.caption2)
+                                .foregroundColor(Theme.Colors.primaryText)
+                                .padding(8)
+                                .background(Color.white)
+                                .cornerRadius(8)
+                        }
+                        .padding(.top)
+                        
                         Spacer(minLength: 60)
                     }
                 }
@@ -144,9 +155,8 @@ struct FeatureRow: View {
             Text(text)
                 .font(.subheadline)
                 .foregroundColor(Theme.Colors.primaryText)
-            
-            Spacer()
         }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -163,11 +173,13 @@ struct ModernTextField: View {
             
             TextField(placeholder, text: $text)
                 .font(.body)
+                .foregroundColor(Theme.Colors.primaryText)
+                .accentColor(Theme.Colors.accent)
         }
         .padding(Theme.Spacing.medium)
         .background(
             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                .fill(Theme.Colors.surface)
+                .fill(Color.white)
                 .shadow(color: Theme.cardShadow, radius: 4, x: 0, y: 2)
         )
     }
