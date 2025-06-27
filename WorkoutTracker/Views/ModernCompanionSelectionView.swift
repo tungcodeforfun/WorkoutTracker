@@ -27,16 +27,18 @@ struct ModernCompanionSelectionView: View {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: Theme.Spacing.medium) {
                         ForEach(starterCompanions) { companion in
-                            ModernCompanionSelectionCard(
-                                companion: companion,
-                                isSelected: selectedCompanion?.id == companion.id
-                            )
-                            .onTapGesture {
+                            Button(action: {
                                 withAnimation(.spring()) {
                                     selectedCompanion = companion
                                     showingDetails = true
                                 }
+                            }) {
+                                ModernCompanionSelectionCard(
+                                    companion: companion,
+                                    isSelected: selectedCompanion?.id == companion.id
+                                )
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                     .padding(.horizontal)
@@ -60,6 +62,7 @@ struct ModernCompanionSelectionView: View {
                         .cornerRadius(16)
                         .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
+                    .buttonStyle(PlainButtonStyle())
                     .padding(.horizontal)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
@@ -182,6 +185,7 @@ struct CompanionDetailSheet: View {
                                 .font(.title2)
                                 .foregroundColor(.white.opacity(0.8))
                         }
+                        .buttonStyle(PlainButtonStyle())
                         Spacer()
                     }
                     .padding()
@@ -255,6 +259,7 @@ struct CompanionDetailSheet: View {
                             .cornerRadius(16)
                             .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
                         }
+                        .buttonStyle(PlainButtonStyle())
                         .padding(.horizontal)
                         
                         Spacer(minLength: 50)
