@@ -21,27 +21,25 @@ jobs:
     
     - name: Build and Test
       run: |
-        # Find the first available iPhone simulator
-        DEVICE_ID=$(xcrun simctl list devices available | grep iPhone | grep -v "iPhone SE" | head -1 | sed -n 's/.*(\([A-F0-9-]*\)).*/\1/p')
+        # Use a known iPhone 16 simulator ID from the available destinations
+        # From the output, we can see iPhone 16 with iOS 18.4 is available
+        DEVICE_ID="1565B47A-C01C-4B4C-B660-9A278E27558D"
         
-        if [ -z "$DEVICE_ID" ]; then
-          echo "No iPhone simulator found, trying iPad..."
-          DEVICE_ID=$(xcrun simctl list devices available | grep iPad | head -1 | sed -n 's/.*(\([A-F0-9-]*\)).*/\1/p')
-        fi
+        echo "Attempting to use iPhone 16 simulator: $DEVICE_ID"
         
-        if [ -z "$DEVICE_ID" ]; then
-          echo "No iOS simulator found, using generic destination"
-          xcodebuild \
-            -scheme WorkoutTracker \
-            -destination 'generic/platform=iOS Simulator' \
-            -configuration Debug \
-            clean build test \
-            CODE_SIGNING_ALLOWED=NO
+        # First try with the specific iPhone 16 device
+        if xcodebuild \
+          -scheme WorkoutTracker \
+          -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+          -configuration Debug \
+          clean build test \
+          CODE_SIGNING_ALLOWED=NO; then
+          echo "Tests completed successfully with iPhone 16 simulator"
         else
-          echo "Using simulator device: $DEVICE_ID"
+          echo "iPhone 16 simulator failed, trying with Any iOS Simulator Device"
           xcodebuild \
             -scheme WorkoutTracker \
-            -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
             -configuration Debug \
             clean build test \
             CODE_SIGNING_ALLOWED=NO
