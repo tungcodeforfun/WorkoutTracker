@@ -12,39 +12,33 @@ struct ModernDashboardView: View {
     @State private var greeting = "Good Morning"
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Theme.Colors.background.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: Theme.Spacing.large) {
-                        if let user = viewModel.currentUser {
-                            HeaderSection(user: user, greeting: greeting)
-                                .padding(.horizontal)
-                            
-                            if let activePokemon = user.activePokemon {
-                                ModernPokemonCard(pokemon: activePokemon)
-                                    .padding(.horizontal)
-                            }
-                            
-                            QuickActionsSection(viewModel: viewModel)
-                                .padding(.horizontal)
-                            
-                            StatsOverview(user: user)
-                            
-                            RecentActivitySection(user: user)
+        ZStack {
+            Theme.Colors.background.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: Theme.Spacing.large) {
+                    if let user = viewModel.currentUser {
+                        HeaderSection(user: user, greeting: greeting)
+                            .padding(.horizontal)
+                        
+                        if let activePokemon = user.activePokemon {
+                            ModernPokemonCard(pokemon: activePokemon)
                                 .padding(.horizontal)
                         }
+                        
+                        QuickActionsSection(viewModel: viewModel)
+                            .padding(.horizontal)
+                        
+                        StatsOverview(user: user)
+                        
+                        RecentActivitySection(user: user)
+                            .padding(.horizontal)
                     }
-                    .padding(.vertical)
                 }
+                .padding(.vertical)
             }
-            #if os(iOS)
-            .navigationBarBackButtonHidden(true)
-            .toolbar(.hidden, for: .navigationBar)
-            #endif
-            .onAppear { updateGreeting() }
         }
+        .onAppear { updateGreeting() }
     }
     
     private func updateGreeting() {

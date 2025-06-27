@@ -21,7 +21,7 @@ struct ModernTabView: View {
                 }
                 .tag(0)
             
-            WorkoutView(viewModel: viewModel)
+            ModernWorkoutView(viewModel: viewModel)
                 .tabItem {
                     VStack {
                         Image(systemName: viewModel.selectedTab == 1 ? "figure.run" : "figure.walk")

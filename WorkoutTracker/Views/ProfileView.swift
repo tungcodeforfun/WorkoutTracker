@@ -12,38 +12,54 @@ struct ProfileView: View {
     @State private var showingResetAlert = false
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                if let user = viewModel.currentUser {
-                    VStack(spacing: 20) {
-                        ProfileHeader(user: user)
-                        
-                        StatsSection(user: user)
-                        
-                        if !user.badges.isEmpty {
-                            AllBadgesSection(badges: user.badges)
+        ZStack {
+            Theme.Colors.background.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Custom header
+                HStack {
+                    Text("Profile")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(Theme.Colors.primaryText)
+                    
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top, Theme.Spacing.medium)
+                .padding(.bottom, Theme.Spacing.small)
+                
+                ScrollView {
+                    if let user = viewModel.currentUser {
+                        VStack(spacing: 20) {
+                            ProfileHeader(user: user)
+                            
+                            StatsSection(user: user)
+                            
+                            if !user.badges.isEmpty {
+                                AllBadgesSection(badges: user.badges)
+                            }
+                            
+                            WorkoutHistorySection(workouts: user.workouts)
+                            
+                            Button(action: { showingResetAlert = true }) {
+                                Text("Reset Account")
+                                    .foregroundColor(.red)
+                            }
+                            .padding(.top, 20)
                         }
-                        
-                        WorkoutHistorySection(workouts: user.workouts)
-                        
-                        Button(action: { showingResetAlert = true }) {
-                            Text("Reset Account")
-                                .foregroundColor(.red)
-                        }
-                        .padding(.top, 20)
+                        .padding()
                     }
-                    .padding()
                 }
             }
-            .navigationTitle("Profile")
-            .alert("Reset Account", isPresented: $showingResetAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Reset", role: .destructive) {
-                    viewModel.resetUser()
-                }
-            } message: {
-                Text("This will delete all your data including Pokemon, workouts, and badges. This cannot be undone.")
+        }
+        .alert("Reset Account", isPresented: $showingResetAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Reset", role: .destructive) {
+                viewModel.resetUser()
             }
+        } message: {
+            Text("This will delete all your data including Pokemon, workouts, and badges. This cannot be undone.")
         }
     }
 }

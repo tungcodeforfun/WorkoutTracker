@@ -18,7 +18,7 @@ struct ContentView: View {
                 ModernTabView(viewModel: viewModel)
             }
         } else {
-            SimpleOnboardingView(viewModel: viewModel)
+            ModernOnboardingView(viewModel: viewModel)
         }
     }
 }

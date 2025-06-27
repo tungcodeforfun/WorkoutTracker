@@ -18,8 +18,8 @@ struct SimpleOnboardingView: View {
             ZStack {
                 LinearGradient(
                     colors: [
-                        Theme.Colors.gradientStart.opacity(0.08),
-                        Theme.Colors.gradientMiddle.opacity(0.05),
+                        Theme.Colors.accent.opacity(0.08),
+                        Theme.Colors.accent.opacity(0.05),
                         Theme.Colors.background
                     ],
                     startPoint: .topLeading,
@@ -77,7 +77,7 @@ struct SimpleOnboardingView: View {
                         
                         // Features
                         VStack(spacing: Theme.Spacing.medium) {
-                            FeatureRow(icon: "sparkles", text: "Catch & train Pokemon", color: Theme.Colors.gradientStart)
+                            FeatureRow(icon: "sparkles", text: "Catch & train Pokemon", color: .purple)
                             FeatureRow(icon: "figure.run", text: "Track real workouts", color: Theme.Colors.accent)
                             FeatureRow(icon: "trophy.fill", text: "Earn badges & rewards", color: Theme.Colors.warning)
                         }
@@ -127,7 +127,7 @@ struct SimpleOnboardingView: View {
                             viewModel.resetUser()
                         }
                         .font(.caption2)
-                        .foregroundColor(Theme.Colors.tertiaryText)
+                        .foregroundColor(Theme.Colors.secondaryText.opacity(0.6))
                         .padding(.top, 20)
                         
                         Spacer(minLength: 60)
@@ -180,7 +180,7 @@ struct ModernTextField: View {
                 .fill(Theme.Colors.surface)
                 .overlay(
                     RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                        .stroke(Theme.Colors.separator, lineWidth: 1)
+                        .stroke(Theme.Colors.secondaryText.opacity(0.3), lineWidth: 1)
                 )
                 .shadow(color: Theme.Colors.shadow, radius: 8, x: 0, y: 3)
         )

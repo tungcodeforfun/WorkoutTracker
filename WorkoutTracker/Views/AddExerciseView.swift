@@ -126,7 +126,7 @@ struct AddExerciseView: View {
     }
     
     private func calculateXP() -> Int {
-        var exercise = Exercise(name: exerciseName, type: exerciseType)
+        var exercise = Exercise(name: exerciseName.isEmpty ? "Exercise" : exerciseName, type: exerciseType)
         exercise.sets = Int(sets)
         exercise.reps = Int(reps)
         exercise.weight = Double(weight)

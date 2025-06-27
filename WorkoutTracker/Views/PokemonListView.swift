@@ -12,27 +12,43 @@ struct PokemonListView: View {
     @State private var selectedPokemon: Pokemon?
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                if let user = viewModel.currentUser {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                        ForEach(user.pokemon) { pokemon in
-                            PokemonDetailCard(
-                                pokemon: pokemon,
-                                isActive: pokemon.id == user.activePokemonId
-                            )
-                            .onTapGesture {
-                                selectedPokemon = pokemon
+        ZStack {
+            Theme.Colors.background.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Custom header
+                HStack {
+                    Text("My Pokemon")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(Theme.Colors.primaryText)
+                    
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top, Theme.Spacing.medium)
+                .padding(.bottom, Theme.Spacing.small)
+                
+                ScrollView {
+                    if let user = viewModel.currentUser {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                            ForEach(user.pokemon) { pokemon in
+                                PokemonDetailCard(
+                                    pokemon: pokemon,
+                                    isActive: pokemon.id == user.activePokemonId
+                                )
+                                .onTapGesture {
+                                    selectedPokemon = pokemon
+                                }
                             }
                         }
+                        .padding()
                     }
-                    .padding()
                 }
             }
-            .navigationTitle("My Pokemon")
-            .sheet(item: $selectedPokemon) { pokemon in
-                PokemonManagementSheet(pokemon: pokemon, viewModel: viewModel)
-            }
+        }
+        .sheet(item: $selectedPokemon) { pokemon in
+            PokemonManagementSheet(pokemon: pokemon, viewModel: viewModel)
         }
     }
 }
