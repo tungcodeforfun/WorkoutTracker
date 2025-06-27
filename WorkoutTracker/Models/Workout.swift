@@ -71,7 +71,7 @@ struct Workout: Identifiable, Codable {
     var exercises: [Exercise]
     var totalDuration: TimeInterval
     var notes: String?
-    var pokemonUsed: UUID?
+    var companionUsed: UUID?
     
     init(date: Date = Date()) {
         self.id = UUID()
