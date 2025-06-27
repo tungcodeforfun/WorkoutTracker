@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- GitHub Actions CI/CD simulator detection reliability
+- Test compilation errors with missing Foundation import
+- Compiler warnings in test suite
+
 ### Planned
 - iCloud sync for cross-device data
 - Additional companion types and evolutions
