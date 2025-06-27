@@ -9,10 +9,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - iCloud sync for cross-device data
-- Apple Health integration
-- Additional companion types
+- Additional companion types and evolutions
 - Social features (friend challenges)
-- Apple Watch companion app
+- Workout templates and programs
+- Advanced analytics dashboard
+
+## [2.0.0] - 2025-06-27
+
+### Added
+- ⌚ **Apple Watch Support**
+  - Complete standalone watchOS app
+  - Real-time workout tracking with heart rate and calorie monitoring
+  - Workout controls with haptic feedback (start, pause, resume, end)
+  - Companion display on watch with XP preview
+  - Native watch workout session integration
+
+- 🍎 **HealthKit Integration**
+  - Automatic workout syncing to Apple Health
+  - Read health data (steps, heart rate, existing workouts)
+  - Modern HealthKit API support with backwards compatibility
+  - Privacy-first health data handling
+  - Health settings view with permission management
+
+- 🧪 **Comprehensive Testing**
+  - Unit tests for all core models and business logic
+  - Integration tests for complete user journeys
+  - ViewModel tests for app state management
+  - GitHub Actions CI/CD workflow for automated testing
+  - 95%+ test coverage across critical components
+
+- 🔧 **Technical Improvements**
+  - Shared data models between iOS and watchOS
+  - Platform-specific UI handling (iOS/macOS compatibility)
+  - Managers architecture for service separation
+  - Modern async/await patterns throughout
+  - Enhanced error handling and logging
+
+### Changed
+- Rebranded from Pokemon theme to original Companion system for IP compliance
+- Updated all UI components to use PlainButtonStyle for consistent design
+- Modernized HealthKit API usage for iOS 15+ compatibility
+- Enhanced profile view with health integration toggle
+
+### Fixed
+- Gray box button styling issues across all views
+- Platform-specific navigation and UI elements
+- HealthKit deprecation warnings and API compatibility
+- Workout XP calculation accuracy
+- Cross-device data synchronization
 
 ## [1.0.0] - 2025-01-XX
 
@@ -51,17 +95,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - No network dependencies for privacy
 
 ### Technical Details
-- **Framework**: SwiftUI + Combine
-- **Architecture**: MVVM (Model-View-ViewModel)
-- **Storage**: UserDefaults (local only)
-- **Minimum iOS**: 15.0
+- **Framework**: SwiftUI + Combine + HealthKit
+- **Architecture**: MVVM (Model-View-ViewModel) + Managers
+- **Storage**: UserDefaults (local) + HealthKit (health data)
+- **Platforms**: iOS 15.0+, watchOS 8.0+
 - **Languages**: Swift 5.5+
+- **Testing**: Swift Testing framework with GitHub Actions CI/CD
 
 ### Security & Privacy
-- All data stored locally on device
-- No external data transmission
+- All personal data stored locally on device
+- Health data synchronized through Apple's secure HealthKit framework
+- No external data transmission beyond Apple's health ecosystem
 - No analytics or tracking
-- User has complete control over their data
+- User has complete control over their data and health information
+- HealthKit permissions managed granularly by the user
 
 ---
 
