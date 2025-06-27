@@ -21,12 +21,31 @@ jobs:
     
     - name: Build and Test
       run: |
-        xcodebuild \
-          -scheme WorkoutTracker \
-          -destination 'platform=iOS Simulator,id=dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder' \
-          -configuration Debug \
-          clean build test \
-          CODE_SIGNING_ALLOWED=NO
+        # Find the first available iPhone simulator
+        DEVICE_ID=$(xcrun simctl list devices available | grep iPhone | grep -v "iPhone SE" | head -1 | sed -n 's/.*(\([A-F0-9-]*\)).*/\1/p')
+        
+        if [ -z "$DEVICE_ID" ]; then
+          echo "No iPhone simulator found, trying iPad..."
+          DEVICE_ID=$(xcrun simctl list devices available | grep iPad | head -1 | sed -n 's/.*(\([A-F0-9-]*\)).*/\1/p')
+        fi
+        
+        if [ -z "$DEVICE_ID" ]; then
+          echo "No iOS simulator found, using generic destination"
+          xcodebuild \
+            -scheme WorkoutTracker \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            clean build test \
+            CODE_SIGNING_ALLOWED=NO
+        else
+          echo "Using simulator device: $DEVICE_ID"
+          xcodebuild \
+            -scheme WorkoutTracker \
+            -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+            -configuration Debug \
+            clean build test \
+            CODE_SIGNING_ALLOWED=NO
+        fi
     
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
