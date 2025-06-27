@@ -21,343 +21,315 @@ struct ModernAddExerciseView: View {
     @State private var notes = ""
     @State private var selectedCommonExercise: String?
     
+    private var isValid: Bool {
+        !exerciseName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
     var body: some View {
-        NavigationView {
-            ZStack {
-                Theme.Colors.background.ignoresSafeArea()
+        ZStack {
+            // Dark gradient background like other modern views
+            LinearGradient(
+                colors: [Color(red: 0.1, green: 0.15, blue: 0.25), Color(red: 0.25, green: 0.35, blue: 0.55)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                headerSection
                 
                 ScrollView {
                     VStack(spacing: Theme.Spacing.xLarge) {
-                        // Header
-                        VStack(spacing: Theme.Spacing.small) {
-                            Text("Add Exercise")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                                .foregroundColor(Theme.Colors.primaryText)
-                            
-                            Text("Track your workout and earn XP!")
-                                .font(.subheadline)
-                                .foregroundColor(Theme.Colors.secondaryText)
-                        }
-                        .padding(.top)
-                        
-                        // Exercise Selection Card
-                        VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
-                            Text("Exercise")
-                                .font(.headline)
-                                .foregroundColor(Theme.Colors.primaryText)
-                            
-                            // Common exercises picker
-                            Menu {
-                                Button("Custom Exercise") {
-                                    selectedCommonExercise = nil
-                                    exerciseName = ""
-                                }
-                                
-                                ForEach(Array(commonExercises.keys).sorted(), id: \.self) { exercise in
-                                    Button(exercise) {
-                                        selectedCommonExercise = exercise
-                                        exerciseName = exercise
-                                        if let type = commonExercises[exercise] {
-                                            exerciseType = type
-                                        }
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Text(selectedCommonExercise ?? "Choose Exercise")
-                                        .foregroundColor(selectedCommonExercise == nil ? Theme.Colors.secondaryText : Theme.Colors.primaryText)
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(Theme.Colors.secondaryText)
-                                }
-                                .padding()
-                                .background(
-                                    RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                                        .fill(Theme.Colors.surface)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                                                .stroke(Theme.Colors.accent.opacity(0.3), lineWidth: 1)
-                                        )
-                                )
-                            }
-                            
-                            // Custom exercise name field
-                            if selectedCommonExercise == nil {
-                                TextField("Enter exercise name", text: $exerciseName)
-                                    .font(.body)
-                                    .foregroundColor(Theme.Colors.primaryText)
-                                    .padding()
-                                    .background(
-                                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                            .fill(Theme.Colors.surface)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                    .stroke(Theme.Colors.accent.opacity(0.2), lineWidth: 1)
-                                            )
-                                    )
-                            }
-                            
-                            // Exercise type picker
-                            VStack(alignment: .leading, spacing: Theme.Spacing.small) {
-                                Text("Type")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(Theme.Colors.primaryText)
-                                
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: Theme.Spacing.small) {
-                                        ForEach(ExerciseType.allCases, id: \.self) { type in
-                                            ExerciseTypeChip(
-                                                type: type,
-                                                isSelected: exerciseType == type
-                                            ) {
-                                                exerciseType = type
-                                            }
-                                        }
-                                    }
-                                    .padding(.horizontal, 1)
-                                }
-                            }
-                        }
-                        .modernCard()
-                        
-                        // Exercise Details Card
-                        VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
-                            Text("Details")
-                                .font(.headline)
-                                .foregroundColor(Theme.Colors.primaryText)
-                            
-                            if exerciseType == .strength {
-                                HStack(spacing: Theme.Spacing.medium) {
-                                    VStack(alignment: .leading, spacing: Theme.Spacing.xSmall) {
-                                        Text("Sets")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(Theme.Colors.primaryText)
-                                        TextField("0", text: $sets)
-                                            .font(.body)
-                                            .foregroundColor(Theme.Colors.primaryText)
-                                            #if os(iOS)
-                                            .keyboardType(.numberPad)
-                                            #endif
-                                            .padding()
-                                            .background(
-                                                RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                    .fill(Theme.Colors.surface)
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                            .stroke(Theme.Colors.accent.opacity(0.2), lineWidth: 1)
-                                                    )
-                                            )
-                                    }
-                                    
-                                    Text("×")
-                                        .font(.title2)
-                                        .foregroundColor(Theme.Colors.secondaryText)
-                                        .padding(.top, 30)
-                                    
-                                    VStack(alignment: .leading, spacing: Theme.Spacing.xSmall) {
-                                        Text("Reps")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(Theme.Colors.primaryText)
-                                        TextField("0", text: $reps)
-                                            .font(.body)
-                                            .foregroundColor(Theme.Colors.primaryText)
-                                            #if os(iOS)
-                                            .keyboardType(.numberPad)
-                                            #endif
-                                            .padding()
-                                            .background(
-                                                RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                    .fill(Theme.Colors.surface)
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                            .stroke(Theme.Colors.accent.opacity(0.2), lineWidth: 1)
-                                                    )
-                                            )
-                                    }
-                                }
-                                
-                                VStack(alignment: .leading, spacing: Theme.Spacing.xSmall) {
-                                    Text("Weight (kg)")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(Theme.Colors.primaryText)
-                                    TextField("0", text: $weight)
-                                        .font(.body)
-                                        .foregroundColor(Theme.Colors.primaryText)
-                                        #if os(iOS)
-                                        .keyboardType(.decimalPad)
-                                        #endif
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                .fill(Theme.Colors.surface)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                        .stroke(Theme.Colors.accent.opacity(0.2), lineWidth: 1)
-                                                )
-                                        )
-                                }
-                            }
-                            
-                            if exerciseType == .cardio {
-                                VStack(alignment: .leading, spacing: Theme.Spacing.xSmall) {
-                                    Text("Duration (minutes)")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(Theme.Colors.primaryText)
-                                    TextField("0", text: $duration)
-                                        .font(.body)
-                                        .foregroundColor(Theme.Colors.primaryText)
-                                        #if os(iOS)
-                                        .keyboardType(.numberPad)
-                                        #endif
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                .fill(Theme.Colors.surface)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                        .stroke(Theme.Colors.accent.opacity(0.2), lineWidth: 1)
-                                                )
-                                        )
-                                }
-                                
-                                VStack(alignment: .leading, spacing: Theme.Spacing.xSmall) {
-                                    Text("Distance (km)")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(Theme.Colors.primaryText)
-                                    TextField("0.0", text: $distance)
-                                        .font(.body)
-                                        .foregroundColor(Theme.Colors.primaryText)
-                                        #if os(iOS)
-                                        .keyboardType(.decimalPad)
-                                        #endif
-                                        .padding()
-                                        .background(
-                                            RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                .fill(Theme.Colors.surface)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                        .stroke(Theme.Colors.accent.opacity(0.2), lineWidth: 1)
-                                                )
-                                        )
-                                }
-                            }
-                            
-                            VStack(alignment: .leading, spacing: Theme.Spacing.xSmall) {
-                                Text("Notes (optional)")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(Theme.Colors.primaryText)
-                                TextField("Add any notes...", text: $notes)
-                                    .font(.body)
-                                    .foregroundColor(Theme.Colors.primaryText)
-                                    .padding()
-                                    .background(
-                                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                            .fill(Theme.Colors.surface)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
-                                                    .stroke(Theme.Colors.accent.opacity(0.2), lineWidth: 1)
-                                            )
-                                    )
-                            }
-                        }
-                        .modernCard()
-                        
-                        // XP Preview Card
-                        VStack(spacing: Theme.Spacing.medium) {
-                            HStack {
-                                Image(systemName: "bolt.fill")
-                                    .foregroundColor(Theme.Colors.warning)
-                                
-                                Text("XP Preview")
-                                    .font(.headline)
-                                    .foregroundColor(Theme.Colors.primaryText)
-                                
-                                Spacer()
-                            }
-                            
-                            HStack {
-                                Text("Your Pokemon will gain")
-                                    .foregroundColor(Theme.Colors.secondaryText)
-                                
-                                Spacer()
-                                
-                                Text("\(calculateXP()) XP")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(Theme.Colors.success)
-                            }
-                        }
-                        .modernCard()
+                        subtitleSection
+                        exerciseSelectionSection
+                        exerciseDetailsSection
+                        xpPreviewSection
                         
                         Spacer(minLength: 100)
                     }
                     .padding()
                 }
             }
-            #if os(iOS)
-            .navigationBarHidden(true)
-            #endif
-            .overlay(
-                // Bottom action bar
-                VStack {
-                    Spacer()
-                    
-                    HStack(spacing: Theme.Spacing.medium) {
-                        Button("Cancel") {
-                            dismiss()
-                        }
-                        .secondaryButtonStyle()
-                        .frame(width: 100)
-                        
-                        Button(action: addExercise) {
-                            HStack {
-                                Text("Add Exercise")
-                                Image(systemName: "plus.circle.fill")
-                            }
-                        }
-                        .primaryButtonStyle()
-                        .disabled(exerciseName.isEmpty)
+        }
+    }
+}
+
+// MARK: - View Components
+extension ModernAddExerciseView {
+    private var headerSection: some View {
+        HStack {
+            Button("Cancel") {
+                dismiss()
+            }
+            .font(.system(size: 16, weight: .medium))
+            .foregroundColor(.white.opacity(0.8))
+            
+            Spacer()
+            
+            Text("Add Exercise")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
+            
+            Spacer()
+            
+            Button("Add") {
+                addExercise()
+            }
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundColor(isValid ? .blue : .white.opacity(0.5))
+            .disabled(!isValid)
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 20)
+        .padding(.bottom, 16)
+    }
+    
+    private var subtitleSection: some View {
+        VStack(spacing: Theme.Spacing.small) {
+            Text("Track your workout and earn XP!")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.8))
+                .padding(.top)
+        }
+    }
+    
+    private var exerciseSelectionSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+            Text("Exercise")
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            exercisePickerMenu
+            
+            if selectedCommonExercise == nil {
+                customExerciseField
+            }
+            
+            exerciseTypeSelector
+        }
+        .padding(Theme.Spacing.medium)
+        .background(cardBackground)
+    }
+    
+    private var exercisePickerMenu: some View {
+        Menu {
+            Button("Custom Exercise") {
+                selectedCommonExercise = nil
+                exerciseName = ""
+            }
+            
+            ForEach(Array(commonExercises.keys).sorted(), id: \.self) { exercise in
+                Button(exercise) {
+                    selectedCommonExercise = exercise
+                    exerciseName = exercise
+                    if let type = commonExercises[exercise] {
+                        exerciseType = type
                     }
-                    .padding()
-                    .background(
-                        Rectangle()
-                            .fill(Theme.Colors.surface)
-                            .shadow(color: Theme.Colors.shadow, radius: 10, x: 0, y: -2)
-                            .ignoresSafeArea(edges: .bottom)
-                    )
                 }
+            }
+        } label: {
+            HStack {
+                Text(selectedCommonExercise ?? "Choose Exercise")
+                    .foregroundColor(selectedCommonExercise == nil ? .white.opacity(0.6) : .white)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.down")
+                    .foregroundColor(.white.opacity(0.8))
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                    )
             )
         }
     }
     
+    private var customExerciseField: some View {
+        TextField("Enter exercise name", text: $exerciseName)
+            .font(.body)
+            .foregroundColor(.white)
+            .textFieldStyle(PlainTextFieldStyle())
+            .accentColor(.blue)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                    )
+            )
+    }
+    
+    private var exerciseTypeSelector: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+            Text("Type")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.white)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Theme.Spacing.small) {
+                    ForEach(ExerciseType.allCases, id: \.self) { type in
+                        ExerciseTypeChip(
+                            type: type,
+                            isSelected: exerciseType == type
+                        ) {
+                            exerciseType = type
+                        }
+                    }
+                }
+                .padding(.horizontal, 1)
+            }
+        }
+    }
+    
+    private var exerciseDetailsSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+            Text("Details")
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            if exerciseType == .strength {
+                strengthFields
+            }
+            
+            if exerciseType == .cardio {
+                cardioFields
+            }
+            
+            notesField
+        }
+        .padding(Theme.Spacing.medium)
+        .background(cardBackground)
+    }
+    
+    private var strengthFields: some View {
+        VStack(spacing: Theme.Spacing.medium) {
+            HStack(spacing: Theme.Spacing.medium) {
+                inputField(title: "Sets", text: $sets, placeholder: "0")
+                
+                Text("×")
+                    .font(.title2)
+                    .foregroundColor(.white.opacity(0.8))
+                    .padding(.top, 30)
+                
+                inputField(title: "Reps", text: $reps, placeholder: "0")
+            }
+            
+            inputField(title: "Weight (kg)", text: $weight, placeholder: "0")
+        }
+    }
+    
+    private var cardioFields: some View {
+        VStack(spacing: Theme.Spacing.medium) {
+            inputField(title: "Duration (minutes)", text: $duration, placeholder: "0")
+            inputField(title: "Distance (km)", text: $distance, placeholder: "0.0")
+        }
+    }
+    
+    private var notesField: some View {
+        inputField(title: "Notes (optional)", text: $notes, placeholder: "Add any notes...")
+    }
+    
+    private func inputField(title: String, text: Binding<String>, placeholder: String) -> some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xSmall) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.white)
+            
+            TextField(placeholder, text: text)
+                .font(.body)
+                .foregroundColor(.white)
+                .textFieldStyle(PlainTextFieldStyle())
+                .accentColor(.blue)
+                #if os(iOS)
+                .keyboardType(title.contains("Weight") || title.contains("Distance") ? .decimalPad : (title.contains("Notes") ? .default : .numberPad))
+                #endif
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
+                        .fill(Color.white.opacity(0.03))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
+                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                        )
+                )
+        }
+    }
+    
+    private var xpPreviewSection: some View {
+        VStack(spacing: Theme.Spacing.medium) {
+            HStack {
+                Image(systemName: "bolt.fill")
+                    .foregroundColor(.yellow)
+                
+                Text("XP Preview")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+            }
+            
+            HStack {
+                Text("Your Pokemon will gain")
+                    .foregroundColor(.white.opacity(0.8))
+                
+                Spacer()
+                
+                Text("\(calculateXP()) XP")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.green)
+            }
+        }
+        .padding(Theme.Spacing.medium)
+        .background(cardBackground)
+    }
+    
+    private var cardBackground: some View {
+        RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
+            .fill(Color.white.opacity(0.02))
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
+                    .stroke(Color.white.opacity(0.03), lineWidth: 1)
+            )
+    }
+}
+
+// MARK: - Functions
+extension ModernAddExerciseView {
     private func calculateXP() -> Int {
         var exercise = Exercise(name: exerciseName.isEmpty ? "Exercise" : exerciseName, type: exerciseType)
-        exercise.sets = Int(sets)
-        exercise.reps = Int(reps)
-        exercise.weight = Double(weight)
-        exercise.duration = Double(duration).map { $0 * 60 }
-        exercise.distance = Double(distance)
+        exercise.sets = sets.isEmpty ? nil : Int(sets)
+        exercise.reps = reps.isEmpty ? nil : Int(reps)
+        exercise.weight = weight.isEmpty ? nil : Double(weight)
+        exercise.duration = duration.isEmpty ? nil : (Double(duration) != nil ? Double(duration)! * 60 : nil)
+        exercise.distance = distance.isEmpty ? nil : Double(distance)
         return exercise.experiencePoints
     }
     
     private func addExercise() {
-        var exercise = Exercise(name: exerciseName, type: exerciseType)
-        exercise.sets = Int(sets)
-        exercise.reps = Int(reps)
-        exercise.weight = Double(weight)
-        exercise.duration = Double(duration).map { $0 * 60 }
-        exercise.distance = Double(distance)
+        let trimmedName = exerciseName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+        
+        var exercise = Exercise(name: trimmedName, type: exerciseType)
+        
+        // Convert string inputs to numbers, defaulting to nil if invalid
+        exercise.sets = sets.isEmpty ? nil : Int(sets)
+        exercise.reps = reps.isEmpty ? nil : Int(reps)
+        exercise.weight = weight.isEmpty ? nil : Double(weight)
+        exercise.duration = duration.isEmpty ? nil : (Double(duration) != nil ? Double(duration)! * 60 : nil)
+        exercise.distance = distance.isEmpty ? nil : Double(distance)
         exercise.notes = notes.isEmpty ? nil : notes
+        
+        print("Adding exercise: \(exercise.name), XP: \(exercise.experiencePoints)")
         
         withAnimation(.spring()) {
             workout.exercises.append(exercise)
@@ -365,7 +337,6 @@ struct ModernAddExerciseView: View {
         dismiss()
     }
 }
-
 
 struct ExerciseTypeChip: View {
     let type: ExerciseType

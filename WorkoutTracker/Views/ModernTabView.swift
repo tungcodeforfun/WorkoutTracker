@@ -33,7 +33,7 @@ struct ModernTabView: View {
             PokemonListView(viewModel: viewModel)
                 .tabItem {
                     VStack {
-                        Image(systemName: viewModel.selectedTab == 2 ? "sparkles" : "sparkle")
+                        Image(systemName: viewModel.selectedTab == 2 ? "sparkles" : "sparkles")
                         Text("Pokemon")
                     }
                 }
@@ -48,7 +48,7 @@ struct ModernTabView: View {
                 }
                 .tag(3)
         }
-        .tint(Theme.Colors.accent)
+        .tint(Color.blue)
     }
 }
 

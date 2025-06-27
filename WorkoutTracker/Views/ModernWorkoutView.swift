@@ -14,16 +14,24 @@ struct ModernWorkoutView: View {
     @State private var workoutStartTime = Date()
     @State private var isWorkoutActive = false
     @State private var showingCompletionAnimation = false
+    @State private var isPaused = false
     
     var body: some View {
         ZStack {
-            Theme.Colors.background.ignoresSafeArea()
+            // Dark gradient background like other modern views
+            LinearGradient(
+                colors: [Color(red: 0.1, green: 0.15, blue: 0.25), Color(red: 0.25, green: 0.35, blue: 0.55)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
             
             if isWorkoutActive {
                 ModernActiveWorkoutView(
                     workout: $currentWorkout,
                     startTime: workoutStartTime,
                     activePokemon: viewModel.currentUser?.activePokemon,
+                    isPaused: $isPaused,
                     onAddExercise: { showingExerciseSheet = true },
                     onFinish: finishWorkout
                 )
@@ -74,8 +82,17 @@ struct ModernStartWorkoutView: View {
     @State private var pulseAnimation = false
     
     var body: some View {
-        VStack(spacing: Theme.Spacing.xLarge) {
-            Spacer()
+        ZStack {
+            // Dark gradient background
+            LinearGradient(
+                colors: [Color(red: 0.1, green: 0.15, blue: 0.25), Color(red: 0.25, green: 0.35, blue: 0.55)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: Theme.Spacing.xLarge) {
+                Spacer()
             
             // Pokemon motivation section
             if let pokemon = activePokemon {
@@ -108,12 +125,12 @@ struct ModernStartWorkoutView: View {
                         Text("\(pokemon.nickname ?? pokemon.name) is ready to train!")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(Theme.Colors.primaryText)
+                            .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                         
                         Text("Level \(pokemon.level) • \(pokemon.experience)/\(pokemon.experienceForNextLevel()) XP")
                             .font(.subheadline)
-                            .foregroundColor(Theme.Colors.secondaryText)
+                            .foregroundColor(.white.opacity(0.8))
                     }
                 }
             }
@@ -123,11 +140,11 @@ struct ModernStartWorkoutView: View {
                 Text("Ready to Power Up?")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(Theme.Colors.primaryText)
+                    .foregroundColor(.white)
                 
                 Text("Every rep makes your Pokemon stronger!")
                     .font(.body)
-                    .foregroundColor(Theme.Colors.secondaryText)
+                    .foregroundColor(.white.opacity(0.8))
                     .multilineTextAlignment(.center)
             }
             
@@ -145,17 +162,29 @@ struct ModernStartWorkoutView: View {
             Button(action: onStart) {
                 HStack(spacing: Theme.Spacing.small) {
                     Image(systemName: "play.fill")
+                        .font(.system(size: 18, weight: .semibold))
                     Text("Start Training")
+                        .font(.system(size: 18, weight: .semibold))
                 }
-                .font(.headline)
-                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(
+                    LinearGradient(
+                        colors: [Color.blue, Color.purple],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(16)
+                .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
             }
-            .primaryButtonStyle()
             .padding(.horizontal)
             
-            Spacer()
+                Spacer()
+            }
+            .padding()
         }
-        .padding()
     }
 }
 
@@ -177,7 +206,7 @@ struct WorkoutBenefit: View {
             
             Text(text)
                 .font(.subheadline)
-                .foregroundColor(Theme.Colors.primaryText)
+                .foregroundColor(.white)
             
             Spacer()
         }
@@ -189,19 +218,31 @@ struct ModernActiveWorkoutView: View {
     @Binding var workout: Workout
     let startTime: Date
     let activePokemon: Pokemon?
+    @Binding var isPaused: Bool
     let onAddExercise: () -> Void
     let onFinish: () -> Void
     
     @State private var elapsedTime = ""
     @State private var timer: Timer?
     @State private var showingXPGain = false
+    @State private var pausedDuration: TimeInterval = 0
+    @State private var pauseStartTime: Date?
     
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack {
+            // Dark gradient background
+            LinearGradient(
+                colors: [Color(red: 0.1, green: 0.15, blue: 0.25), Color(red: 0.25, green: 0.35, blue: 0.55)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
             // Header with Pokemon and timer
             VStack(spacing: Theme.Spacing.medium) {
                 if let pokemon = activePokemon {
-                    ModernPokemonWorkoutHeader(pokemon: pokemon, elapsedTime: elapsedTime)
+                    ModernPokemonWorkoutHeader(pokemon: pokemon, elapsedTime: elapsedTime, isPaused: isPaused)
                 }
                 
                 // XP Progress
@@ -209,14 +250,14 @@ struct ModernActiveWorkoutView: View {
                     HStack {
                         Text("Workout XP")
                             .font(.subheadline)
-                            .foregroundColor(Theme.Colors.secondaryText)
+                            .foregroundColor(.white.opacity(0.8))
                         
                         Spacer()
                         
                         Text("\(workout.totalExperience) XP")
                             .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundColor(Theme.Colors.success)
+                            .foregroundColor(.green)
                     }
                     
                     ProgressView(value: Double(workout.totalExperience), total: 100.0)
@@ -226,8 +267,11 @@ struct ModernActiveWorkoutView: View {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                        .fill(Theme.Colors.surface)
-                        .shadow(color: Theme.Colors.shadow, radius: 4, x: 0, y: 2)
+                        .fill(Color.white.opacity(0.03))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        )
                 )
             }
             .padding()
@@ -266,11 +310,10 @@ struct ModernActiveWorkoutView: View {
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                                .fill(Theme.Colors.accent.opacity(0.05))
+                                .fill(Color.white.opacity(0.03))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                                        .stroke(Theme.Colors.accent, lineWidth: 1)
-                                        .opacity(0.3)
+                                        .stroke(Color.blue.opacity(0.5), lineWidth: 1)
                                 )
                         )
                     }
@@ -283,35 +326,78 @@ struct ModernActiveWorkoutView: View {
                 Divider()
                 
                 HStack(spacing: Theme.Spacing.medium) {
-                    Button("Pause") {
-                        // Pause functionality
-                    }
-                    .secondaryButtonStyle()
-                    .frame(width: 100)
-                    
-                    Button(action: onFinish) {
-                        HStack {
-                            Text("Finish Workout")
-                            Image(systemName: "checkmark.circle.fill")
+                    Button(isPaused ? "Resume" : "Pause") {
+                        withAnimation(.spring()) {
+                            isPaused.toggle()
                         }
                     }
-                    .primaryButtonStyle()
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 100, height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 2)
+                    )
+                    
+                    Button(action: onFinish) {
+                        HStack(spacing: 8) {
+                            Text("Finish Workout")
+                                .font(.system(size: 16, weight: .semibold))
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.green, Color.blue],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                        .shadow(color: Color.green.opacity(0.3), radius: 8, x: 0, y: 4)
+                    }
                     .disabled(workout.exercises.isEmpty)
+                    .opacity(workout.exercises.isEmpty ? 0.6 : 1.0)
                 }
                 .padding(.horizontal)
             }
-            .background(Theme.Colors.surface)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
+            )
+            }
         }
         .onAppear { startTimer() }
         .onDisappear { stopTimer() }
+        .onChange(of: isPaused) { paused in
+            if paused {
+                pauseStartTime = Date()
+            } else {
+                if let pauseStart = pauseStartTime {
+                    pausedDuration += Date().timeIntervalSince(pauseStart)
+                    pauseStartTime = nil
+                }
+            }
+        }
     }
     
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            let elapsed = Date().timeIntervalSince(startTime)
-            let minutes = Int(elapsed) / 60
-            let seconds = Int(elapsed) % 60
-            elapsedTime = String(format: "%02d:%02d", minutes, seconds)
+            if !isPaused {
+                let totalElapsed = Date().timeIntervalSince(startTime)
+                let currentPausedDuration = pausedDuration + (pauseStartTime != nil ? Date().timeIntervalSince(pauseStartTime!) : 0)
+                let activeElapsed = totalElapsed - currentPausedDuration
+                let minutes = Int(activeElapsed) / 60
+                let seconds = Int(activeElapsed) % 60
+                elapsedTime = String(format: "%02d:%02d", minutes, seconds)
+            }
         }
     }
     
@@ -324,6 +410,7 @@ struct ModernActiveWorkoutView: View {
 struct ModernPokemonWorkoutHeader: View {
     let pokemon: Pokemon
     let elapsedTime: String
+    let isPaused: Bool
     @State private var isAnimating = false
     
     var body: some View {
@@ -349,16 +436,16 @@ struct ModernPokemonWorkoutHeader: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(pokemon.nickname ?? pokemon.name)
                     .font(.headline)
-                    .foregroundColor(Theme.Colors.primaryText)
+                    .foregroundColor(.white)
                 
-                Text("Training Hard!")
+                Text(isPaused ? "Taking a Break" : "Training Hard!")
                     .font(.caption)
-                    .foregroundColor(pokemon.type.color)
+                    .foregroundColor(isPaused ? .orange : pokemon.type.color)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
                     .background(
                         Capsule()
-                            .fill(pokemon.type.color.opacity(0.1))
+                            .fill((isPaused ? Color.orange : pokemon.type.color).opacity(0.1))
                     )
             }
             
@@ -369,19 +456,22 @@ struct ModernPokemonWorkoutHeader: View {
                 Text(elapsedTime)
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(Theme.Colors.primaryText)
+                    .foregroundColor(.white)
                     .monospacedDigit()
                 
                 Text("Workout Time")
                     .font(.caption2)
-                    .foregroundColor(Theme.Colors.secondaryText)
+                    .foregroundColor(.white.opacity(0.8))
             }
         }
         .padding()
         .background(
             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                .fill(Theme.Colors.surface)
-                .shadow(color: Theme.Colors.shadow, radius: 6, x: 0, y: 3)
+                .fill(Color.white.opacity(0.03))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
         )
     }
 }
@@ -394,7 +484,7 @@ struct ModernExerciseCard: View {
             HStack {
                 Text(exercise.name)
                     .font(.headline)
-                    .foregroundColor(Theme.Colors.primaryText)
+                    .foregroundColor(.white)
                 
                 Spacer()
                 
@@ -436,8 +526,11 @@ struct ModernExerciseCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                .fill(Theme.Colors.surface)
-                .shadow(color: Theme.Colors.shadow, radius: 4, x: 0, y: 2)
+                .fill(Color.white.opacity(0.03))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
         )
     }
 }

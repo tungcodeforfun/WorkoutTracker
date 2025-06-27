@@ -86,8 +86,11 @@ struct ModernCardModifier: ViewModifier {
             .padding(Theme.Spacing.medium)
             .background(
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
-                    .fill(Theme.Colors.surface)
-                    .shadow(color: Theme.cardShadow, radius: 8, x: 0, y: 2)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Theme.CornerRadius.large)
+                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    )
             )
     }
 }
