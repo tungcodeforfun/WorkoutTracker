@@ -25,21 +25,25 @@ struct HealthKitSettingsView: View {
                         VStack(alignment: .leading) {
                             Text("HealthKit Integration")
                                 .font(.headline)
-                            Text(appViewModel.healthKitEnabled ? "Connected" : "Not Connected")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            if let manager = appViewModel.healthKitManager, !manager.isHealthKitAvailable {
+                                Text("Not Available (Simulator)")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            } else {
+                                Text(appViewModel.healthKitEnabled ? "Connected" : "Not Connected")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
                         Spacer()
                         
-                        if !appViewModel.healthKitEnabled {
+                        if let manager = appViewModel.healthKitManager, manager.isHealthKitAvailable && !appViewModel.healthKitEnabled {
                             Button("Enable") {
                                 Task {
                                     do {
-                                        if let manager = appViewModel.healthKitManager {
-                                            try await manager.requestHealthKitPermissions()
-                                            appViewModel.healthKitEnabled = manager.authorizationStatus == .sharingAuthorized
-                                        }
+                                        try await manager.requestHealthKitPermissions()
+                                        appViewModel.healthKitEnabled = manager.authorizationStatus == .sharingAuthorized
                                     } catch {
                                         print("Failed to enable HealthKit: \(error)")
                                     }
@@ -50,7 +54,16 @@ struct HealthKitSettingsView: View {
                     }
                 }
                 
-                if appViewModel.healthKitEnabled {
+                if let manager = appViewModel.healthKitManager, !manager.isHealthKitAvailable {
+                    Section {
+                        Label("HealthKit is not available in the iOS Simulator", systemImage: "info.circle")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("To test HealthKit features, please run the app on a physical device.")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                } else if appViewModel.healthKitEnabled {
                     Section("Today's Health Data") {
                         HStack {
                             Image(systemName: "figure.walk")
