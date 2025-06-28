@@ -47,9 +47,9 @@ struct WorkoutTrackerTests {
         #expect(user.level >= 1)
         
         // Verify companion gained XP (should equal workout XP since it started at 0)
-        let updatedCompanion = user.companions.first(where: { $0.id == companion.id })!
-        #expect(updatedCompanion.experience == workout.totalExperience)
-        #expect(updatedCompanion.experience > 0)
+        let activeCompanion = user.companions.first(where: { $0.id == user.activeCompanionId })!
+        #expect(activeCompanion.experience == workout.totalExperience)
+        #expect(activeCompanion.experience > 0)
         
         // Verify workout was properly linked to companion
         #expect(user.workouts.first?.companionUsed == companion.id)
