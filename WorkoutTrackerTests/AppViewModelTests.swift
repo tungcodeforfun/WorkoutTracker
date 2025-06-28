@@ -23,6 +23,7 @@ struct AppViewModelTests {
         #expect(viewModel.selectedTab == 0)
         #expect(viewModel.showingCompanionSelection == false)
         #expect(viewModel.showingWorkoutCreation == false)
+        #expect(viewModel.healthKitEnabled == false) // Should be false in test environment
     }
     
     // MARK: - User Creation Tests
