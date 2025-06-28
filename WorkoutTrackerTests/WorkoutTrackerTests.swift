@@ -20,7 +20,9 @@ struct WorkoutTrackerTests {
         var user = User(username: "integration", trainerName: "Integration Tester")
         let companion = Companion(name: "IntegrationMon", type: .flame, evolutionLevel: 3, evolvedForm: "SuperMon")
         user.addCompanion(companion)
-        user.setActiveCompanion(companion.id) // Set as active so it gains XP
+        
+        // Verify companion is set as active (should be automatic since it's the first)
+        #expect(user.activeCompanionId == companion.id)
         
         // Create a comprehensive workout
         var workout = Workout()
@@ -45,7 +47,7 @@ struct WorkoutTrackerTests {
         #expect(user.level >= 1)
         
         // Verify companion gained XP (should equal workout XP since it started at 0)
-        let updatedCompanion = user.companions.first!
+        let updatedCompanion = user.companions.first(where: { $0.id == companion.id })!
         #expect(updatedCompanion.experience == workout.totalExperience)
         #expect(updatedCompanion.experience > 0)
         
