@@ -14,7 +14,7 @@ class AppViewModel: ObservableObject {
     @Published var selectedTab = 0
     @Published var showingCompanionSelection = false
     @Published var showingWorkoutCreation = false
-    @Published var healthKitManager = HealthKitManager()
+    @Published var healthKitManager: HealthKitManager?
     @Published var healthKitEnabled = false
     
     init() {
@@ -29,10 +29,15 @@ class AppViewModel: ObservableObject {
             return
         }
         
+        // Only create HealthKitManager in non-test environment
+        healthKitManager = HealthKitManager()
+        
         Task {
             do {
-                try await healthKitManager.requestHealthKitPermissions()
-                healthKitEnabled = healthKitManager.authorizationStatus == .sharingAuthorized
+                if let manager = healthKitManager {
+                    try await manager.requestHealthKitPermissions()
+                    healthKitEnabled = manager.authorizationStatus == .sharingAuthorized
+                }
             } catch {
                 print("HealthKit setup failed: \(error)")
                 healthKitEnabled = false
@@ -58,10 +63,10 @@ class AppViewModel: ObservableObject {
         saveUser()
         
         // Sync to HealthKit if enabled
-        if healthKitEnabled {
+        if healthKitEnabled, let manager = healthKitManager {
             Task {
                 do {
-                    try await healthKitManager.saveWorkout(workout)
+                    try await manager.saveWorkout(workout)
                 } catch {
                     print("Failed to save workout to HealthKit: \(error)")
                 }
