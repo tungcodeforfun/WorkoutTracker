@@ -20,6 +20,7 @@ struct WorkoutTrackerTests {
         var user = User(username: "integration", trainerName: "Integration Tester")
         let companion = Companion(name: "IntegrationMon", type: .flame, evolutionLevel: 3, evolvedForm: "SuperMon")
         user.addCompanion(companion)
+        user.setActiveCompanion(companion.id) // Set as active so it gains XP
         
         // Create a comprehensive workout
         var workout = Workout()

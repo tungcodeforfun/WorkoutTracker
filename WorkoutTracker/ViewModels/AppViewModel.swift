@@ -86,6 +86,11 @@ class AppViewModel: ObservableObject {
     
     
     private func loadUser() {
+        // Skip loading user data in test environment to ensure clean state
+        guard !ProcessInfo.processInfo.environment.keys.contains("XCTestConfigurationFilePath") else {
+            return
+        }
+        
         guard let userData = UserDefaults.standard.data(forKey: "currentUser") else {
             return
         }
