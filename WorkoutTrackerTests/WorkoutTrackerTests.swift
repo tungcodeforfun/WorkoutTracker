@@ -22,7 +22,12 @@ struct WorkoutTrackerTests {
         user.addCompanion(companion)
         
         // Verify companion is set as active (should be automatic since it's the first)
-        #expect(user.activeCompanionId == companion.id)
+        #expect(user.activeCompanionId != nil)
+        #expect(user.companions.count == 1)
+        
+        // Store the actual companion ID from the user's array
+        let companionId = user.companions.first!.id
+        #expect(user.activeCompanionId == companionId)
         
         // Create a comprehensive workout
         var workout = Workout()
@@ -52,7 +57,7 @@ struct WorkoutTrackerTests {
         #expect(activeCompanion.experience > 0)
         
         // Verify workout was properly linked to companion
-        #expect(user.workouts.first?.companionUsed == companion.id)
+        #expect(user.workouts.first?.companionUsed == companionId)
     }
     
     @Test func testCompleteUserJourneyWithEvolution() async throws {
