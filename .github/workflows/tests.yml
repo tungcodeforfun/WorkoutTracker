@@ -29,23 +29,43 @@ jobs:
     - name: Build and Test
       timeout-minutes: 20
       run: |
-        # Use a known iPhone 16 simulator ID from the available destinations
-        DEVICE_ID="1565B47A-C01C-4B4C-B660-9A278E27558D"
-        IPAD_ID="2BF9F98D-7837-4C0F-BBC9-BDEAD8325D03"
+        echo "Finding available simulators..."
         
-        echo "Starting simulator boot process..."
-        xcrun simctl boot "$DEVICE_ID" || echo "Failed to boot iPhone 16 simulator"
+        # Get first available iPhone simulator
+        IPHONE_ID=$(xcrun simctl list devices available | grep "iPhone" | head -1 | grep -oE '[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}' || echo "")
         
-        echo "Attempting to use iPhone 16 simulator: $DEVICE_ID"
+        if [ -n "$IPHONE_ID" ]; then
+          echo "Using iPhone simulator: $IPHONE_ID"
+          DEVICE_ID="$IPHONE_ID"
+        else
+          # Fallback to first available iPad
+          IPAD_ID=$(xcrun simctl list devices available | grep "iPad" | head -1 | grep -oE '[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}' || echo "")
+          if [ -n "$IPAD_ID" ]; then
+            echo "Using iPad simulator: $IPAD_ID"
+            DEVICE_ID="$IPAD_ID"
+          else
+            echo "No available simulators found!"
+            exit 1
+          fi
+        fi
         
-        # First try with the specific iPhone 16 device - Unit tests only
-        if xcodebuild \
+        echo "Selected simulator ID: $DEVICE_ID"
+        
+        # Boot the simulator
+        xcrun simctl boot "$DEVICE_ID" || echo "Simulator already booted or failed to boot"
+        
+        # Build for testing
+        echo "Building for testing..."
+        xcodebuild \
           -project WorkoutTracker.xcodeproj \
           -scheme WorkoutTracker \
           -destination "platform=iOS Simulator,id=$DEVICE_ID" \
           -configuration Debug \
           build-for-testing \
-          CODE_SIGNING_ALLOWED=NO && \
+          CODE_SIGNING_ALLOWED=NO
+        
+        # Run tests with explicit test plan
+        echo "Running unit tests..."
         xcodebuild \
           -project WorkoutTracker.xcodeproj \
           -scheme WorkoutTracker \
@@ -53,31 +73,8 @@ jobs:
           -configuration Debug \
           test-without-building \
           -only-testing:WorkoutTrackerTests \
-          CODE_SIGNING_ALLOWED=NO; then
-          echo "Tests completed successfully with iPhone 16 simulator"
-        else
-          echo "iPhone 16 simulator failed, trying with iPad simulator as fallback"
-          
-          # Reset and try iPad
-          xcrun simctl shutdown all
-          xcrun simctl boot "$IPAD_ID" || echo "Failed to boot iPad simulator"
-          
-          xcodebuild \
-            -project WorkoutTracker.xcodeproj \
-            -scheme WorkoutTracker \
-            -destination "platform=iOS Simulator,id=$IPAD_ID" \
-            -configuration Debug \
-            build-for-testing \
-            CODE_SIGNING_ALLOWED=NO && \
-          xcodebuild \
-            -project WorkoutTracker.xcodeproj \
-            -scheme WorkoutTracker \
-            -destination "platform=iOS Simulator,id=$IPAD_ID" \
-            -configuration Debug \
-            test-without-building \
-            -only-testing:WorkoutTrackerTests \
-            CODE_SIGNING_ALLOWED=NO
-        fi
+          -disable-concurrent-testing \
+          CODE_SIGNING_ALLOWED=NO
     
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
