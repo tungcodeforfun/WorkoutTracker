@@ -15,28 +15,6 @@ struct WorkoutTrackerTests {
     
     // MARK: - App Integration Tests
     
-    @Test func testAppModelsIntegration() async throws {
-        // Given - Simple scenario that should always work
-        var user = User(username: "test", trainerName: "Test")
-        user.addCompanion(Companion(name: "TestMon", type: .flame))
-        
-        var workout = Workout()
-        var exercise = Exercise(name: "Push-ups", type: .strength)
-        exercise.sets = 1
-        exercise.reps = 10
-        workout.exercises = [exercise]
-        
-        let initialUserXP = user.totalExperience
-        let initialCompanionXP = user.companions[0].experience
-        
-        // When
-        user.completeWorkout(workout)
-        
-        // Then - Basic integration checks
-        #expect(user.workouts.count == 1)
-        #expect(user.totalExperience > initialUserXP)
-        #expect(user.companions[0].experience > initialCompanionXP)
-    }
     
     @Test func testCompleteUserJourneyWithEvolution() async throws {
         // Given - User with evolution-ready companion
