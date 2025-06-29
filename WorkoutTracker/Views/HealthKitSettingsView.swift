@@ -25,19 +25,25 @@ struct HealthKitSettingsView: View {
                         VStack(alignment: .leading) {
                             Text("HealthKit Integration")
                                 .font(.headline)
-                            Text(appViewModel.healthKitEnabled ? "Connected" : "Not Connected")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            if let manager = appViewModel.healthKitManager, !manager.isHealthKitAvailable {
+                                Text("Not Available (Simulator)")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            } else {
+                                Text(appViewModel.healthKitEnabled ? "Connected" : "Not Connected")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
                         Spacer()
                         
-                        if !appViewModel.healthKitEnabled {
+                        if let manager = appViewModel.healthKitManager, manager.isHealthKitAvailable && !appViewModel.healthKitEnabled {
                             Button("Enable") {
                                 Task {
                                     do {
-                                        try await appViewModel.healthKitManager.requestHealthKitPermissions()
-                                        appViewModel.healthKitEnabled = appViewModel.healthKitManager.authorizationStatus == .sharingAuthorized
+                                        try await manager.requestHealthKitPermissions()
+                                        appViewModel.healthKitEnabled = manager.authorizationStatus == .sharingAuthorized
                                     } catch {
                                         print("Failed to enable HealthKit: \(error)")
                                     }
@@ -48,7 +54,16 @@ struct HealthKitSettingsView: View {
                     }
                 }
                 
-                if appViewModel.healthKitEnabled {
+                if let manager = appViewModel.healthKitManager, !manager.isHealthKitAvailable {
+                    Section {
+                        Label("HealthKit is not available in the iOS Simulator", systemImage: "info.circle")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("To test HealthKit features, please run the app on a physical device.")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                } else if appViewModel.healthKitEnabled {
                     Section("Today's Health Data") {
                         HStack {
                             Image(systemName: "figure.walk")
@@ -76,7 +91,9 @@ struct HealthKitSettingsView: View {
                                 .italic()
                         } else {
                             ForEach(recentWorkouts, id: \.uuid) { workout in
-                                WorkoutRowView(workout: workout, healthKitManager: appViewModel.healthKitManager)
+                                if let manager = appViewModel.healthKitManager {
+                                    WorkoutRowView(workout: workout, healthKitManager: manager)
+                                }
                             }
                         }
                     }
@@ -115,11 +132,13 @@ struct HealthKitSettingsView: View {
         isLoading = true
         
         do {
-            // Load today's steps
-            todaysSteps = try await appViewModel.healthKitManager.fetchTodaysSteps()
-            
-            // Load recent workouts
-            recentWorkouts = try await appViewModel.healthKitManager.fetchRecentWorkouts(limit: 5)
+            if let manager = appViewModel.healthKitManager {
+                // Load today's steps
+                todaysSteps = try await manager.fetchTodaysSteps()
+                
+                // Load recent workouts
+                recentWorkouts = try await manager.fetchRecentWorkouts(limit: 5)
+            }
         } catch {
             print("Failed to load health data: \(error)")
         }
@@ -132,7 +151,7 @@ struct HealthKitSettingsView: View {
 
 struct WorkoutRowView: View {
     let workout: HKWorkout
-    let healthKitManager: HealthKitManager
+    let healthKitManager: HealthKitManager?
     @State private var calories: Double?
     
     var body: some View {
@@ -159,7 +178,9 @@ struct WorkoutRowView: View {
         .padding(.vertical, 2)
         .task {
             do {
-                calories = try await healthKitManager.getWorkoutEnergyBurned(workout)
+                if let manager = healthKitManager {
+                    calories = try await manager.getWorkoutEnergyBurned(workout)
+                }
             } catch {
                 print("Failed to get calories for workout: \(error)")
             }

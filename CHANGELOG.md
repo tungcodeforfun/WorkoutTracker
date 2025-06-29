@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- GitHub Actions CI/CD simulator detection and reliability issues
+- Test compilation errors with missing Foundation imports (UUID, JSONEncoder, JSONDecoder)
+- Optional value unwrapping errors in test assertions
+- App startup crashes in CI environment due to HealthKit initialization
+- Test environment isolation for HealthKit functionality
+- Exercise XP calculation test assertions
+- Compiler warnings in test suite
+- UI test target hanging issues in CI pipeline
+
 ### Planned
 - iCloud sync for cross-device data
 - Additional companion types and evolutions

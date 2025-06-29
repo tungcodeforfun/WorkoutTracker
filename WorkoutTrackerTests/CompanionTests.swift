@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import WorkoutTracker
 
 struct CompanionTests {
@@ -40,8 +41,8 @@ struct CompanionTests {
         let companion = Companion(name: "Starter", type: .aqua, evolutionLevel: evolutionLevel, evolvedForm: evolvedForm)
         
         // Then
-        #expect(companion.evolutionLevel == evolutionLevel)
-        #expect(companion.evolvedForm == evolvedForm)
+        #expect(companion.evolutionLevel == Optional(evolutionLevel))
+        #expect(companion.evolvedForm == Optional(evolvedForm))
     }
     
     // MARK: - Experience and Leveling Tests
