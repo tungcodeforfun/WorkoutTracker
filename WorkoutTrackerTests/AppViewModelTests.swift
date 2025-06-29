@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import WorkoutTracker
 
 @MainActor
@@ -22,6 +23,7 @@ struct AppViewModelTests {
         #expect(viewModel.selectedTab == 0)
         #expect(viewModel.showingCompanionSelection == false)
         #expect(viewModel.showingWorkoutCreation == false)
+        #expect(viewModel.healthKitEnabled == false) // Should be false in test environment
     }
     
     // MARK: - User Creation Tests
@@ -54,7 +56,7 @@ struct AppViewModelTests {
         viewModel.selectStarterCompanion(companion)
         
         // Then
-        #expect(viewModel.currentUser?.companions.count == 1)
+        #expect((viewModel.currentUser?.companions.count ?? 0) == 1)
         #expect(viewModel.currentUser?.companions.first?.name == companion.name)
         #expect(viewModel.currentUser?.activeCompanionId == companion.id)
         #expect(viewModel.showingCompanionSelection == false)
@@ -118,8 +120,8 @@ struct AppViewModelTests {
         viewModel.completeWorkout(workout)
         
         // Then
-        #expect(viewModel.currentUser?.workouts.count == initialWorkoutCount + 1)
-        #expect(viewModel.currentUser?.companions.first?.experience > initialCompanionXP)
+        #expect((viewModel.currentUser?.workouts.count ?? 0) == initialWorkoutCount + 1)
+        #expect((viewModel.currentUser?.companions.first?.experience ?? 0) > initialCompanionXP)
     }
     
     // MARK: - User Reset Tests
@@ -190,9 +192,9 @@ struct AppViewModelTests {
         
         // Then - Verify full state
         #expect(viewModel.currentUser != nil)
-        #expect(viewModel.currentUser?.companions.count == 1)
-        #expect(viewModel.currentUser?.workouts.count == 1)
-        #expect(viewModel.currentUser?.totalExperience > 0)
+        #expect((viewModel.currentUser?.companions.count ?? 0) == 1)
+        #expect((viewModel.currentUser?.workouts.count ?? 0) == 1)
+        #expect((viewModel.currentUser?.totalExperience ?? 0) > 0)
         #expect(viewModel.showingCompanionSelection == false)
     }
     

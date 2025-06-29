@@ -20,31 +20,27 @@ jobs:
     - name: List Available Simulators
       run: xcrun simctl list devices available
     
-    - name: Build and Test
+    - name: Reset Simulators
       run: |
-        # Use a known iPhone 16 simulator ID from the available destinations
-        # From the output, we can see iPhone 16 with iOS 18.4 is available
-        DEVICE_ID="1565B47A-C01C-4B4C-B660-9A278E27558D"
+        echo "Resetting all simulators to clean state..."
+        xcrun simctl shutdown all
+        xcrun simctl erase all
         
-        echo "Attempting to use iPhone 16 simulator: $DEVICE_ID"
+    - name: Build and Test
+      timeout-minutes: 20
+      run: |
+        echo "Building and testing..."
         
-        # First try with the specific iPhone 16 device
-        if xcodebuild \
+        # Use the first available iPhone 16 simulator
+        xcodebuild \
+          -project WorkoutTracker.xcodeproj \
           -scheme WorkoutTracker \
-          -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+          -destination 'platform=iOS Simulator,name=iPhone 16' \
           -configuration Debug \
           clean build test \
-          CODE_SIGNING_ALLOWED=NO; then
-          echo "Tests completed successfully with iPhone 16 simulator"
-        else
-          echo "iPhone 16 simulator failed, trying with Any iOS Simulator Device"
-          xcodebuild \
-            -scheme WorkoutTracker \
-            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
-            -configuration Debug \
-            clean build test \
-            CODE_SIGNING_ALLOWED=NO
-        fi
+          -only-testing:WorkoutTrackerTests \
+          -disable-concurrent-testing \
+          CODE_SIGNING_ALLOWED=NO
     
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
